@@ -1,16 +1,13 @@
 import http from "http";
-import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {userController} from "./controllers/userController.js";
 const PORT = process.env.PORT
-const HOST = process.env.HOST
 import sendJSON from './utils/sendJson.js'
 import {ImageController} from "./controllers/imageController.js";
 import serveStatic from "./serveStatic.js";
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
+//CORS
 function handleCORS(req, res) {
     res.setHeader("Access-Control-Allow-Origin", "*");
     
@@ -27,6 +24,7 @@ function handleCORS(req, res) {
 
     return false;
 }
+//API
 const server = http.createServer(async (req, res) => {
     const isOptions = handleCORS(req, res);
     //Kiểm tra và phản hồi Preflight OPTIONS ngay lập tức
@@ -62,8 +60,9 @@ const server = http.createServer(async (req, res) => {
         if (req.method === "GET" && req.url.startsWith("/api/users/")) {
             // const url = new URL(req.url, `${HOST}:${PORT}`);
 
-            const userId = url.pathname.split("/")[3];
+            // const userId = url.pathname.split("/")[3];
 
+            const userId = req.url.split("/")[3];
             return await userController.getUserById(
                 req,
                 res,
@@ -77,10 +76,11 @@ const server = http.createServer(async (req, res) => {
         
         // PUT /api/users/{id}
         if (req.method === "PUT" && req.url.startsWith("/api/users/")) {
-            const url = new URL(req.url, `${HOST}:${PORT}`);
+            // const url = new URL(req.url, `${HOST}:${PORT}`);
 
-            const userId = url.pathname.split("/")[3];
+            // const userId = url.pathname.split("/")[3];
 
+            const userId = req.url.split("/")[3];
             return await userController.updateUser(
                 req,
                 res,
@@ -101,7 +101,7 @@ const server = http.createServer(async (req, res) => {
         if (req.method === "POST" && req.url === "/login") {
             return await userController.checklogin(req, res);
         }
-                //route POST /api/images
+        //route POST /api/images
         if (req.method === "POST" && req.url === "/api/images") {
             return await ImageController.upload(req, res);
         }

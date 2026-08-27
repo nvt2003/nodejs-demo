@@ -252,15 +252,14 @@ async function editUser(id) {
             return;
         }
         const user = data.result;
-        console.log(user[0])
         userIdInput.value =
-            user[0].id;
+            user.id;
         nameInput.value =
-            user[0].name || "";
+            user.name || "";
         emailInput.value =
-            user[0].email || "";
+            user.email || "";
         passwordInput.value =
-            user[0].password || "";
+            user.password || "";
         imageInput.value =
             "";
         formTitle.textContent =

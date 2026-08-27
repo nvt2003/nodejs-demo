@@ -43,7 +43,7 @@ const userModel = {
   getUserById: async(id) => {
     const query = 'SELECT * FROM users WHERE id = ?';
     const [results] = await connection.query(query,[id]);
-    return results;
+    return results[0];
   },
   //đăng nhập
   checklogin:async(email,password)=>{
