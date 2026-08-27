@@ -28,3 +28,12 @@ export async function getSession(req) {
 
   return await sessionModel.findValidSession(sessionId);
 }
+export function destroySession(req) {
+  const session = getSession(req);
+  if (session) {
+    // Tìm sessionId để xóa
+    const cookieHeader = req.headers.cookie;
+    const sessionId = Object.fromEntries(cookieHeader.split(';').map(c => c.trim().split('=')))['sessionId'];
+    sessions.delete(sessionId);
+  }
+}
