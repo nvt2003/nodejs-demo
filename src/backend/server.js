@@ -1,9 +1,16 @@
 import http from "http";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import {userController} from "./controllers/userController.js";
 const PORT = process.env.PORT
 const HOST = process.env.HOST
 import sendJSON from './utils/sendJson.js'
 import {ImageController} from "./controllers/imageController.js";
+import serveStatic from "./serveStatic.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 function handleCORS(req, res) {
     res.setHeader("Access-Control-Allow-Origin", "*");
     
@@ -53,7 +60,7 @@ const server = http.createServer(async (req, res) => {
         
         // GET /api/users/{id}
         if (req.method === "GET" && req.url.startsWith("/api/users/")) {
-            const url = new URL(req.url, `${HOST}:${PORT}`);
+            // const url = new URL(req.url, `${HOST}:${PORT}`);
 
             const userId = url.pathname.split("/")[3];
 
@@ -98,7 +105,13 @@ const server = http.createServer(async (req, res) => {
         if (req.method === "POST" && req.url === "/api/images") {
             return await ImageController.upload(req, res);
         }
+        // =========================
+        // FRONTEND
+        // =========================
 
+        if (req.method === "GET") {
+            return serveStatic(req, res);
+        }
 
         return sendJSON(res, 404, {
             error: "Not found"
@@ -123,8 +136,6 @@ const server = http.createServer(async (req, res) => {
             error: "Lỗi server"
         });
     }
-    
-serveStatic(req,res);
 });
 
 // server.listen(PORT, () => {
