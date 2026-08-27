@@ -337,11 +337,17 @@ export const userController={
         try{
             const response = await userModel.checklogin(email,password);
             //kiểm tra xem đăng nhập thành công không
-            if (response&&response.length>0)
+            if (response&&response.length>0){
                 return sendJSON(res,200,{
                     message:"Đăng nhập thành công",
                     result:response[0]
                 })
+            }else{
+                return sendJSON(res,500,{
+                    message:"Không tìm thấy thông tin đăng nhập! Sai tài khoản hoặc mật khẩu!",
+                    result:response[0]
+                })
+            }
         }catch(error){
             return sendJSON(res,500,{
                 message:"Đăng nhập thất bại"
