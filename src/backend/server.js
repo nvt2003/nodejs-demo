@@ -5,6 +5,8 @@ const PORT = process.env.PORT
 import sendJSON from './utils/sendJson.js'
 import {ImageController} from "./controllers/imageController.js";
 import serveStatic from "./serveStatic.js";
+import { authController } from "./controllers/authController.js";
+import {checkRole} from "./utils/auth.js"
 
 const __filename = fileURLToPath(import.meta.url);
 //CORS
@@ -37,23 +39,21 @@ const server = http.createServer(async (req, res) => {
                 timestamp: new Date().toISOString()
             });
         }
-
-        // GET /api/users/export
-        if (req.method === "GET" && req.url === "/api/users/export") {
-            return await userController.exportCSV(req, res);
+        
+        //route POST /login
+        if (req.method === "POST" && req.url === "/login") {
+            return await authController.login(req, res);
         }
-        // POST /api/users/import
-        if (req.method === "POST" && req.url === "/api/users/import") {
-            return await userController.importCSV(req, res);
+        //==========required login==========================
+        //route POST /logout
+        if (req.method === "POST" && req.url === "/logout") {
+            return await checkRole([],authController.logout(req,res));
         }
-        // POST /api/users/sendEmail
-        if (req.method === "POST" && req.url === "/api/users/sendEmail") {
-            return await userController.sendEmail(req, res);
-        }
+        //=========allow view=======================
 
         // GET /api/users
         if (req.method === "GET" && req.url === "/api/users") {
-            return await userController.getUsers(req, res);
+            return await checkRole(['Admin','View'],userController.getUsers(req, res));
         }
         
         // GET /api/users/{id}
@@ -63,15 +63,35 @@ const server = http.createServer(async (req, res) => {
             // const userId = url.pathname.split("/")[3];
 
             const userId = req.url.split("/")[3];
-            return await userController.getUserById(
+            return await checkRole(['Admin','View'],
+                userController.getUserById(
                 req,
                 res,
                 userId
-            );
+            ));
         }
+
+        //=========allow edit=======================
+        // GET /api/users/export
+        if (req.method === "GET" && req.url === "/api/users/export") {
+            return await checkRole(['Admin','Edit'],
+                userController.exportCSV(req, res));
+        }
+        // POST /api/users/import
+        if (req.method === "POST" && req.url === "/api/users/import") {
+            return await checkRole(['Admin','Edit'],
+                userController.importCSV(req, res));
+        }
+        // POST /api/users/sendEmail
+        if (req.method === "POST" && req.url === "/api/users/sendEmail") {
+            return await checkRole(['Admin','Edit'],
+                userController.sendEmail(req, res));
+        }
+
         // POST /api/users
         if (req.method === "POST" && req.url === "/api/users") {
-            return await userController.createUser(req, res);
+            return await checkRole(['Admin','Edit'],
+                userController.createUser(req, res));
         }
         
         // PUT /api/users/{id}
@@ -81,29 +101,28 @@ const server = http.createServer(async (req, res) => {
             // const userId = url.pathname.split("/")[3];
 
             const userId = req.url.split("/")[3];
-            return await userController.updateUser(
+            return await checkRole(['Admin','Edit'],
+                userController.updateUser(
                 req,
                 res,
                 userId
-            );
+            ));
         }
         // DELETE /api/users
         if (req.method === "DELETE" && req.url.startsWith("/api/users/")) {
             const userId = req.url.split("/")[3];
 
-            return await userController.deleteUser(
+            return await checkRole(['Admin','Edit'],
+                userController.deleteUser(
                 req,
                 res,
                 userId
-            );
-        }
-        //route POST /login
-        if (req.method === "POST" && req.url === "/login") {
-            return await userController.checklogin(req, res);
+            ));
         }
         //route POST /api/images
         if (req.method === "POST" && req.url === "/api/images") {
-            return await ImageController.upload(req, res);
+            return await checkRole(['Admin','Edit'],
+                ImageController.upload(req, res));
         }
         // =========================
         // FRONTEND
