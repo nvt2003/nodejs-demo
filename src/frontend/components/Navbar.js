@@ -14,8 +14,8 @@ const Navbar = {
                 <div class="header-user-action" style="display: flex; align-items: center; gap: 12px;">
                     ${
                         user ? `
-                            <img src="${user.avatar || 'https://via.placeholder.com/35'}" alt="Avatar" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;" />
-                            <span>${user.name || 'User'}</span>
+                            <img src="${user?.avatar || 'https://via.placeholder.com/35'}" alt="Avatar" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;" />
+                            <span>${user?.name || 'User'}</span>
                             <button id="logout-btn" type="button" style="padding: 6px 12px; background-color: #e74c3c; color: white; border: none; border-radius: 4px; cursor: pointer;">Đăng xuất</button>
                         ` : `
                             <button id="open-login-btn" type="button" style="padding: 6px 16px; background-color: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">Đăng nhập</button>
@@ -76,9 +76,9 @@ const Navbar = {
                 try {
                     const res = await UserApi.login({ email, password });
                     //kiểm tra xem đăng nhập thành công chưa
-                    if (res && (res.status === 200 || res.user)) {
-                        // Lưu thông tin User vào LocalStorage
-                        localStorage.setItem("user", JSON.stringify(res.user));
+                    if (res && res.status === 200 && res.data?.result) {
+                        const user = res.data.result;
+                        localStorage.setItem("user", JSON.stringify(user));
                         alert("Đăng nhập thành công!");
                         window.location.reload(); 
                     } else {

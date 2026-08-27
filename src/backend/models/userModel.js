@@ -47,7 +47,7 @@ const userModel = {
   },
   //đăng nhập
   checklogin:async(email,password)=>{
-    const query = 'SELECT * FROM users WHERE email = ? AND password = ?';
+    const query = 'SELECT id,name,email,avatar FROM users WHERE email = ? AND password = ?';
     const [results] = await connection.query(query,[email,password]);
     return results;
   }
