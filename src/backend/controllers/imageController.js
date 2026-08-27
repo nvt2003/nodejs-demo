@@ -3,6 +3,7 @@ import parseFormData from "../utils/parseFormData.js";
 import sendJSON from "../utils/sendJson.js"
 
 export const ImageController = {
+  //Upload image file to cloudinary and return url
   upload: async (req, res) => {
     try {
       const formData = await parseFormData(req);

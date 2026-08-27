@@ -7,6 +7,7 @@ import Busboy from 'busboy';
 import sendEmail from "../utils/sendEmail.js";
 
 export const userController={
+    //lấy danh sách user gồm id, name, email, password, avatar
     getUsers:async(req,res)=>{
         try{
             const users = await userModel.getUsers();
@@ -28,6 +29,7 @@ export const userController={
             })
         }
     },
+    //lấy thông tin user gồm id, name, email, password, avatar
     getUserById: async (req, res,userId) => {
         try {
 
@@ -52,6 +54,7 @@ export const userController={
             });
         }
     },
+    //tạo user với name, email, password, avatar (url, không bắt buộc)
     createUser:async(req,res)=>{
         try{
             const { name, email, password, avatar } = await getBody(req)
@@ -79,6 +82,7 @@ export const userController={
             })
         }
     },
+    //cập nhật user với name, email, password, avatar (url, không bắt buộc)
     updateUser: async (req, res, userId) => {
         try {
             const { name, email, password, avatar } = await getBody(req)
@@ -110,7 +114,7 @@ export const userController={
             });
         }
     },
-    
+    //delete a user by id
     deleteUser:async(req,res,id)=>{
         try{
             const user = await userModel.getUserById(id)
@@ -139,6 +143,7 @@ export const userController={
             })
         }
     },
+    //Xuất file csv vào thư mục download mặc định của trình duyệt
     exportCSV: async (req, res) => {
         try {
             const rows = await userModel.getUsers();
@@ -161,7 +166,7 @@ export const userController={
             return sendJSON(res, 500, { message: 'Không thể xuất file CSV: ' + error.message });
         }
     },
-
+    //nhập dữ liệu từ file csv đã chọn
     importCSV: async (req, res) => {
         try {
             const contentType = req.headers['content-type'] || '';
@@ -241,6 +246,7 @@ export const userController={
             return sendJSON(res, 500, { message: 'Lỗi import CSV: ' + error.message });
         }
     },
+    //gửi mail với resend
     sendEmail: async(req,res)=>{
         const { to, subject, content } = await getBody(req);
         try{
@@ -261,6 +267,7 @@ export const userController={
             })
         }
     },
+    //Kiểm tra thông tin đăng nhập
     checklogin: async(req,res)=>{
         const {email,password} = await getBody(req);
         try{
