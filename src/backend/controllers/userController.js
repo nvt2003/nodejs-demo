@@ -322,10 +322,15 @@ export const userController={
         try{
             const response = await sendEmail(to,subject,content);
             //nếu thành công
-            if (response)
-            return sendJSON(res,200,{
-                message:"Gửi email thành công"
+            if (response){
+                return sendJSON(res,200,{
+                    message:"Gửi email thành công"
+                })
+            }else {
+            return sendJSON(res,500,{
+                message:"Gửi email thất bại"
             })
+        }
         }catch(error){
             return sendJSON(res,500,{
                 message:"Gửi email thất bại"

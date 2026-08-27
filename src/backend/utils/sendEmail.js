@@ -1,35 +1,31 @@
-require("dotenv").config();
-
-const nodemailer = require("nodemailer");
-
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT),
-  secure: Number(process.env.SMTP_PORT) === 465,
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
-
-/**
- * Gửi email
- *
- * @param {string} to - Email người nhận
- * @param {string} subject - Tiêu đề
- * @param {string} content - Nội dung email
- */
 async function sendEmail(to, subject, content) {
-  const mailOptions = {
-    from: process.env.SMTP_USER,
-    to: to,
-    subject: subject,
-    text: content,
-  };
+    const response = await fetch(
+        "https://api.resend.com/emails",
+        {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${process.env.RESEND_API_KEY}`
+            },
+            body: JSON.stringify({
+                from: "onboarding@resend.dev",
+                to: [to],
+                subject: subject,
+                text: content
+            })
+        }
+    );
 
-  const result = await transporter.sendMail(mailOptions);
+    const data = await response.json();
+    //kiểm tra xem đã gửi email được chưa
+    if (!response.ok) {
+        console.error("Resend error:", data);
+        throw new Error(
+            data.message || "Gửi email thất bại"
+        );
+    }
 
-  return result;
+    return data;
 }
 
-module.exports = sendEmail;
+export default sendEmail;
