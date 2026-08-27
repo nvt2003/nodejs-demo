@@ -33,7 +33,6 @@ function parseFormData(req) {
         });
 
         busboy.on("finish", () => {
-            console.log("PARSED:", formData);
             resolve(formData);
         });
 
