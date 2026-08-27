@@ -1,0 +1,28 @@
+# =========================================================================
+# CẤU HÌNH SERVER CHẠY NODE.JS
+# =========================================================================
+PORT=5000
+HOST=http://localhost
+NODE_ENV=development
+
+# =========================================================================
+# CẤU HÌNH KẾT NỐI DATABASE
+# =========================================================================
+DB_HOST=
+DB_USER=
+DB_PASSWORD=
+DB_NAME=
+DB_PORT=
+
+# =========================================================================
+# CẤU HÌNH LƯU TRỮ FILE (khi làm upload Video/Ảnh)
+# Tùy chọn: Sau này đăng ký Cloudinary thì điền các thông số này vào
+# =========================================================================
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
+#=============
+SMTP_USER=
+SMTP_PASS=
+SMTP_HOST=
+SMTP_PORT=
