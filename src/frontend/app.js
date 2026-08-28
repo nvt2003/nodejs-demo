@@ -45,16 +45,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-// 3. Hàm kiểm tra Session & Role từ Backend
+// Hàm kiểm tra Session & Role từ Backend
 async function checkPermission() {
   try {
-    // const res = await fetch("/me", {
-    //     method: "GET",
-    //     headers: {
-    //         "Content-Type": "application/json"
-    //     },
-    //     credentials: "include"
-    //     });
     const res = await authApi.getMe()
       // Chưa đăng nhập, không làm gì
     if (res.status === 401) {
@@ -78,25 +71,20 @@ function setupRequestButtons() {
   const reqEditBtn = document.getElementById("request-edit-btn");
     //sự kiện yêu cầu quyền xem
   if (reqViewBtn) {
-    reqViewBtn.onclick = () => sendPermissionRequest("View");
+    reqViewBtn.onclick = () => sendPermissionRequest("view");
   }
   //sự kiện yêu cầu quyền sửa
   if (reqEditBtn) {
-    reqEditBtn.onclick = () => sendPermissionRequest("Edit");
+    reqEditBtn.onclick = () => sendPermissionRequest("edit");
   }
 }
 
 //Hàm gửi API yêu cầu quyền lên Server
 async function sendPermissionRequest(requestedRole) {
   try {
-    // const res = await fetch("/api/request-permission", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify({ role: requestedRole })
-    // });
     const res = await permissionApi.requestPermission(requestedRole)
-    const result = await res.json();
-    alert(result.message || `Đã gửi yêu cầu cấp quyền ${requestedRole}`);
+    // const result = await res.json();
+    alert(res.data.message);
   } catch (err) {
     alert("Không thể gửi yêu cầu cấp quyền.");
   }
