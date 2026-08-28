@@ -53,11 +53,15 @@ const server = http.createServer(async (req, res) => {
         if (req.method === "GET" && req.url === "/me") {
             return await checkRole([],authController.getMe)(req,res);
         }
+        // POST /api/request-permission
+        if (req.method === 'POST' && req.url === '/request-permission') {
+            return await checkRole([], authController.requestPermission)(req, res);
+        }
         //=========allow view=======================
 
         // GET /api/users
         if (req.method === "GET" && req.url === "/api/users") {
-            return await checkRole(['admin','view'],userController.getUsers(req, res));
+            return await checkRole(['admin','view'],userController.getUsers)(req, res);
         }
         
         // GET /api/users/{id}
@@ -79,23 +83,23 @@ const server = http.createServer(async (req, res) => {
         // GET /api/users/export
         if (req.method === "GET" && req.url === "/api/users/export") {
             return await checkRole(['admin','edit'],
-                userController.exportCSV(req, res));
+                userController.exportCSV)(req, res);
         }
         // POST /api/users/import
         if (req.method === "POST" && req.url === "/api/users/import") {
             return await checkRole(['admin','edit'],
-                userController.importCSV(req, res));
+                userController.importCSV)(req, res);
         }
         // POST /api/users/sendEmail
         if (req.method === "POST" && req.url === "/api/users/sendEmail") {
             return await checkRole(['admin','edit'],
-                userController.sendEmail(req, res));
+                userController.sendEmail)(req, res);
         }
 
         // POST /api/users
         if (req.method === "POST" && req.url === "/api/users") {
             return await checkRole(['admin','edit'],
-                userController.createUser(req, res));
+                userController.createUser)(req, res);
         }
         
         // PUT /api/users/{id}
@@ -126,7 +130,17 @@ const server = http.createServer(async (req, res) => {
         //route POST /api/images
         if (req.method === "POST" && req.url === "/api/images") {
             return await checkRole(['admin','edit'],
-                ImageController.upload(req, res));
+                ImageController.upload)(req, res);
+        }
+        //=========admin=======================
+        // GET api/permission-requests
+        if (req.method === 'GET' && req.url === '/api/permission-requests') {
+            return await checkRole(['admin'], getPendingRequests)(req, res);
+        }
+
+        // POST api/handle-permission
+        if (req.method === 'POST' && req.url === '/api/handle-permission') {
+            return await checkRole(['admin'], handlePermissionRequest)(req, res);
         }
         // =========================
         // FRONTEND
