@@ -56,7 +56,7 @@ const server = http.createServer(async (req, res) => {
         }
         // POST /api/request-permission
         if (req.method === 'POST' && req.url === '/api/request-permission') {
-            return await checkRole([], authController.requestPermission)(req, res);
+            return await checkRole([], permissionController.requestPermission)(req, res);
         }
         //=========allow view=======================
 
