@@ -38,10 +38,10 @@ async function checkAdminAccess() {
 async function loadPermissionRequests() {
   try {
     const res = await PermissionApi.getPendingRequests()
-    if (!res.ok) return;
+    if (res.status!==200) return;
 
-    const result = await res.json();
-    renderPermissionRequests(result.data || []);
+    // const result = await res.json();
+    renderPermissionRequests(res.data.data || []);
   } catch (err) {
     console.error('Lỗi tải danh sách yêu cầu:', err);
   }
@@ -94,7 +94,7 @@ async function processPermission(requestId, action) {
     const result = await res.json();
     alert(result.message);
     // Load lại danh sách
-    if (res.ok) {
+    if (res.status===200) {
       loadPermissionRequests(); 
     }
   } catch (err) {
