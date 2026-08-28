@@ -3,12 +3,13 @@ import connection from '../config/db.js';
 const sessionModel = {
   // Tạo session mới 
   // trả về true/false
-  createSession: async (sessionId, userId, role, expiresAt) => {
+  createSession: async (sessionId, userId, role ="", expiresAt) => {
+    const safeRole = role || "";
     const query = `
       INSERT INTO sessions (id, user_id, role, expires_at) 
       VALUES (?, ?, ?, ?)
     `;
-    const [results] = await connection.query(query, [sessionId, userId, role, expiresAt]);
+    const [results] = await connection.query(query, [sessionId, userId, safeRole, expiresAt]);
     return results.affectedRows > 0;
   },
 
