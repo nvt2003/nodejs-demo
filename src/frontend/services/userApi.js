@@ -1,16 +1,6 @@
 import BACKEND_URL from "../config/config.js";
 const API = `${BACKEND_URL}/api/users`
-
-async function request(url, options = {}) {
-    const response = await fetch(url, options);
-
-    const data = await response.json();
-
-    return {
-        status: response.status,
-        data
-    };
-}
+import { request } from "./api.js";
 const UserApi = {
     // GET /api/users
     async getUsers() {

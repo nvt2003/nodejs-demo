@@ -4,7 +4,7 @@ import { request } from "./api.js";
 const AUTH_API = `${BACKEND_URL}/api`;
 
 const AuthApi = {
-  // GET /me (hoặc /api/me)
+  // GET /api/me
   async getMe() {
     return await request(`${AUTH_API}/me`);
   },
