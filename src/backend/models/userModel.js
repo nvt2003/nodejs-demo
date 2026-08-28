@@ -41,15 +41,15 @@ const userModel = {
   },
   //Lấy dữ liệu theo id
   getUserById: async(id) => {
-    const query = 'SELECT * FROM users WHERE id = ?';
+    const query = 'SELECT id,name,email,avatar,role FROM users WHERE id = ?';
     const [results] = await connection.query(query,[id]);
     return results[0];
   },
   //đăng nhập
   checklogin:async(email,password)=>{
-    const query = 'SELECT id,name,email,avatar FROM users WHERE email = ? AND password = ?';
+    const query = 'SELECT id,name,email,avatar,role FROM users WHERE email = ? AND password = ?';
     const [results] = await connection.query(query,[email,password]);
-    return results;
+    return results[0];
   }
 
 }

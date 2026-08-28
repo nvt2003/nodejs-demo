@@ -1,5 +1,7 @@
 import userModel from '../models/userModel.js';
 import { createSession, destroySession } from '../utils/session.js';
+import sendJSON from '../utils/sendJson.js';
+import getBody from '../utils/getBody.js';
 
 
 export const authController = {
@@ -12,12 +14,11 @@ export const authController = {
             if (!email || !password) {
             return sendJSON(res, 400, { message: 'Vui lòng nhập đầy đủ email và mật khẩu' });
             }
-            const user = await userModel.findByEmail(email);
+            const user = await userModel.checklogin(email,password);
             // Kiểm tra, xác thực thông tin người dùng
-            if (!user || user.password !== password) {
+            if (!user) {
             return sendJSON(res, 400, { message: 'Email hoặc mật khẩu không chính xác' });
             }
-
             const sessionId = await createSession(user);
             const cookieHeader = {
             'Set-Cookie': `sessionId=${sessionId}; HttpOnly; Path=/; SameSite=Lax`
@@ -25,7 +26,7 @@ export const authController = {
 
             return sendJSON(res, 200, {
                 message: 'Đăng nhập thành công',
-                user: { 
+                result: { 
                     id: user.id, 
                     name: user.name,
                     role: user.role 
@@ -49,5 +50,29 @@ export const authController = {
         } catch (error) {
             return sendJSON(res, 500, { message: 'Lỗi máy chủ', error: error.message });
         }
+    },
+    getMe: async(req,res)=>{
+        try {
+            // Kiểm tra session hợp lệ từ middleware (req.user)
+            if (!req.user || !req.user.id) {
+                return sendJSON(res, 401, { message: 'Phiên làm việc không hợp lệ hoặc đã hết hạn' });
+            }
+            const currentUserId = req.user.user_id;
+            
+            const user = await userModel.getUserById(currentUserId);
+            //không tìm được user
+            if (!user) {
+                return sendJSON(res, 404, { message: 'Tài khoản không tồn tại trên hệ thống' });
+            }
+            return sendJSON(res, 200, {
+                message:"Lấy thông tin thành công",
+                result: user
+            });
+        } catch (error) {
+            return sendJSON(res, 500, { 
+                message: 'Lỗi máy chủ khi lấy thông tin người dùng', 
+                error: error.message 
+                });
+            }
     }
-};
+}
