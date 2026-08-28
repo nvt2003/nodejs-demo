@@ -17,6 +17,11 @@ export default function serveStatic(req, res) {
     if (urlPath === "/") {
         urlPath = "/index.html";
     }
+    //tới permission
+    if (urlPath === "/permission") {
+        urlPath = "/permission.html";
+    }
+
 
     const filePath = path.join(
         FRONTEND_DIR,
