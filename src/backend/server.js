@@ -49,11 +49,15 @@ const server = http.createServer(async (req, res) => {
         if (req.method === "POST" && req.url === "/logout") {
             return await checkRole([],authController.logout(req,res));
         }
+        //route GET /me
+        if (req.method === "GET" && req.url === "/me") {
+            return await checkRole([],authController.getMe)(req,res);
+        }
         //=========allow view=======================
 
         // GET /api/users
         if (req.method === "GET" && req.url === "/api/users") {
-            return await checkRole(['Admin','View'],userController.getUsers(req, res));
+            return await checkRole(['admin','view'],userController.getUsers(req, res));
         }
         
         // GET /api/users/{id}
@@ -63,7 +67,7 @@ const server = http.createServer(async (req, res) => {
             // const userId = url.pathname.split("/")[3];
 
             const userId = req.url.split("/")[3];
-            return await checkRole(['Admin','View'],
+            return await checkRole(['admin','view'],
                 userController.getUserById(
                 req,
                 res,
@@ -74,23 +78,23 @@ const server = http.createServer(async (req, res) => {
         //=========allow edit=======================
         // GET /api/users/export
         if (req.method === "GET" && req.url === "/api/users/export") {
-            return await checkRole(['Admin','Edit'],
+            return await checkRole(['admin','edit'],
                 userController.exportCSV(req, res));
         }
         // POST /api/users/import
         if (req.method === "POST" && req.url === "/api/users/import") {
-            return await checkRole(['Admin','Edit'],
+            return await checkRole(['admin','edit'],
                 userController.importCSV(req, res));
         }
         // POST /api/users/sendEmail
         if (req.method === "POST" && req.url === "/api/users/sendEmail") {
-            return await checkRole(['Admin','Edit'],
+            return await checkRole(['admin','edit'],
                 userController.sendEmail(req, res));
         }
 
         // POST /api/users
         if (req.method === "POST" && req.url === "/api/users") {
-            return await checkRole(['Admin','Edit'],
+            return await checkRole(['admin','edit'],
                 userController.createUser(req, res));
         }
         
@@ -101,7 +105,7 @@ const server = http.createServer(async (req, res) => {
             // const userId = url.pathname.split("/")[3];
 
             const userId = req.url.split("/")[3];
-            return await checkRole(['Admin','Edit'],
+            return await checkRole(['admin','edit'],
                 userController.updateUser(
                 req,
                 res,
@@ -112,7 +116,7 @@ const server = http.createServer(async (req, res) => {
         if (req.method === "DELETE" && req.url.startsWith("/api/users/")) {
             const userId = req.url.split("/")[3];
 
-            return await checkRole(['Admin','Edit'],
+            return await checkRole(['admin','edit'],
                 userController.deleteUser(
                 req,
                 res,
@@ -121,7 +125,7 @@ const server = http.createServer(async (req, res) => {
         }
         //route POST /api/images
         if (req.method === "POST" && req.url === "/api/images") {
-            return await checkRole(['Admin','Edit'],
+            return await checkRole(['admin','edit'],
                 ImageController.upload(req, res));
         }
         // =========================
