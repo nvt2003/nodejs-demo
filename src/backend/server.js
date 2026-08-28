@@ -7,6 +7,7 @@ import {ImageController} from "./controllers/imageController.js";
 import serveStatic from "./serveStatic.js";
 import { authController } from "./controllers/authController.js";
 import {checkRole} from "./utils/auth.js"
+import {permissionController} from "./controllers/permissionController.js"
 
 const __filename = fileURLToPath(import.meta.url);
 //CORS
@@ -50,11 +51,11 @@ const server = http.createServer(async (req, res) => {
             return await checkRole([],authController.logout(req,res));
         }
         //route GET /me
-        if (req.method === "GET" && req.url === "/me") {
+        if (req.method === "GET" && req.url === "/api/me") {
             return await checkRole([],authController.getMe)(req,res);
         }
         // POST /api/request-permission
-        if (req.method === 'POST' && req.url === '/request-permission') {
+        if (req.method === 'POST' && req.url === '/api/request-permission') {
             return await checkRole([], authController.requestPermission)(req, res);
         }
         //=========allow view=======================
@@ -135,12 +136,12 @@ const server = http.createServer(async (req, res) => {
         //=========admin=======================
         // GET api/permission-requests
         if (req.method === 'GET' && req.url === '/api/permission-requests') {
-            return await checkRole(['admin'], getPendingRequests)(req, res);
+            return await checkRole(['admin'], permissionController.getPendingRequests)(req, res);
         }
 
         // POST api/handle-permission
         if (req.method === 'POST' && req.url === '/api/handle-permission') {
-            return await checkRole(['admin'], handlePermissionRequest)(req, res);
+            return await checkRole(['admin'], permissionController.handlePermissionRequest)(req, res);
         }
         // =========================
         // FRONTEND

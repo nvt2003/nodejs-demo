@@ -1,7 +1,7 @@
 import permissionModel from '../models/permissionModel.js';
-import sendJSON from '../utils/response.js';
+import sendJSON from '../utils/sendJson.js';
 import getBody from '../utils/getBody.js';
-export const permissionModel = {
+export const permissionController = {
     requestPermission: async(req, res) => {
         try {
             const userId = req.user?.user_id || req.user?.userId;
@@ -32,6 +32,47 @@ export const permissionModel = {
             }
 
             return sendJSON(res, 500, { message: 'Gửi yêu cầu thất bại' });
+
+        } catch (error) {
+            return sendJSON(res, 500, { message: 'Lỗi máy chủ', error: error.message });
+        }
+    },
+    getPendingRequests: async(req, res) =>{
+        try {
+            const requests = await permissionModel.getPendingRequests();
+            return sendJSON(res, 200, { data: requests });
+        } catch (error) {
+            return sendJSON(res, 500, { message: 'Lỗi máy chủ', error: error.message });
+        }
+    },
+    //Phê duyệt hoặc Từ chối yêu cầu (Chỉ Admin)
+    handlePermissionRequest: async(req, res) =>{
+        try {
+            const { requestId, action } = await getBody(req); // action: 'APPROVE' hoặc 'REJECT'
+
+            if (!requestId || !['APPROVE', 'REJECT'].includes(action)) {
+            return sendJSON(res, 400, { message: 'Dữ liệu không hợp lệ' });
+            }
+
+            // Lấy thông tin request
+            const request = await permissionModel.getRequestById(requestId);
+            if (!request || request.status !== 'PENDING') {
+            return sendJSON(res, 404, { message: 'Yêu cầu không tồn tại hoặc đã được xử lý' });
+            }
+
+            if (action === 'APPROVE') {
+            // Cập nhật role mới cho user trong bảng users
+            await userModel.updateUserRole(request.user_id, request.requested_role);
+            // Đổi trạng thái request thành APPROVED
+            await permissionModel.updateStatus(requestId, 'APPROVED');
+
+            return sendJSON(res, 200, { message: `Đã duyệt quyền ${request.requested_role} cho người dùng thành công` });
+            } else {
+            // Đổi trạng thái request thành REJECTED
+            await permissionModel.updateStatus(requestId, 'REJECTED');
+
+            return sendJSON(res, 200, { message: 'Đã từ chối yêu cầu cấp quyền' });
+            }
 
         } catch (error) {
             return sendJSON(res, 500, { message: 'Lỗi máy chủ', error: error.message });

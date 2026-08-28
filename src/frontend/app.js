@@ -1,5 +1,7 @@
 import UserApi from "./services/userApi.js";
 import imageApi from "./services/imageApi.js";
+import permissionApi from "./services/permissionApi.js";
+import authApi from "./services/authApi.js";
 import Navbar from './components/Navbar.js';
 const form = document.getElementById("user-form");
 
@@ -46,19 +48,19 @@ document.addEventListener("DOMContentLoaded", async () => {
 // 3. Hàm kiểm tra Session & Role từ Backend
 async function checkPermission() {
   try {
-    const res = await fetch("/me", {
-        method: "GET",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        credentials: "include"
-        });
+    // const res = await fetch("/me", {
+    //     method: "GET",
+    //     headers: {
+    //         "Content-Type": "application/json"
+    //     },
+    //     credentials: "include"
+    //     });
+    const res = await authApi.getMe()
       // Chưa đăng nhập, không làm gì
     if (res.status === 401) {
       return null;
     }
-
-    const data = await res?.json();
+    const data = res.data
     // Kiểm tra xem role của user có thuộc danh sách được phép không
     if (data && ALLOWED_ROLES.includes(data.result.role)) {
       return data;
@@ -87,12 +89,12 @@ function setupRequestButtons() {
 //Hàm gửi API yêu cầu quyền lên Server
 async function sendPermissionRequest(requestedRole) {
   try {
-    const res = await fetch("/api/request-permission", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ role: requestedRole })
-    });
-
+    // const res = await fetch("/api/request-permission", {
+    //   method: "POST",
+    //   headers: { "Content-Type": "application/json" },
+    //   body: JSON.stringify({ role: requestedRole })
+    // });
+    const res = await permissionApi.requestPermission(requestedRole)
     const result = await res.json();
     alert(result.message || `Đã gửi yêu cầu cấp quyền ${requestedRole}`);
   } catch (err) {
@@ -109,10 +111,6 @@ function initNavbar() {
         Navbar.afterRender();
     }
 }
-// Chạy hàm init navbar khi trang web tải xong
-document.addEventListener("DOMContentLoaded", () => {
-    initNavbar();
-});
 
 async function loadUsers() {
     try {

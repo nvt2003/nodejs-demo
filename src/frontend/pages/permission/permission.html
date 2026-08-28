@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý Cấp Quyền</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="navbar-container"></div>
+
+    <div class="container">
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 20px;
+        "
+      >
+        <h1>Duyệt Yêu Cầu Cấp Quyền</h1>
+        <a
+          href="index.html"
+          style="
+            padding: 8px 16px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+          "
+        >
+          &larr; Quay lại Quản lý User
+        </a>
+      </div>
+
+      <div class="card">
+        <h2>Danh sách yêu cầu đang chờ</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Tên</th>
+              <th>Email</th>
+              <th>Quyền yêu cầu</th>
+              <th>Ngày gửi</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="permission-request-list"></tbody>
+        </table>
+      </div>
+    </div>
+    <script type="module" src="/pages/permission/permission.js"></script>
+  </body>
+</html>
