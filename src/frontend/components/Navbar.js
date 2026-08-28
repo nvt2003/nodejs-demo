@@ -9,6 +9,8 @@ const Navbar = {
             <header class="main-header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; background-color: #2c3e50; color: #fff;">
                 <div class="header-logo" style="font-weight: bold;">
                     <a href="#" style="color: #fff; text-decoration: none;">My App</a>
+                    <a href="/" style="color: #fff; text-decoration: none;">User</a>
+                    <a href="/permission" style="color: #fff; text-decoration: none;">Permission</a>
                 </div>
 
                 <div class="header-user-action" style="display: flex; align-items: center; gap: 12px;">
@@ -106,3 +108,12 @@ const Navbar = {
 };
 
 export default Navbar;
+export function initNavbar() { 
+    const container = document.getElementById("navbar-container"); 
+    // Render HTML của Navbar 
+    // Kích hoạt sự kiện đăng nhập / đăng xuất 
+    if (container) { 
+        container.innerHTML = Navbar.render(); 
+        Navbar.afterRender(); 
+    } 
+}
