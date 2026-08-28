@@ -1,4 +1,5 @@
 import permissionModel from '../models/permissionModel.js';
+import userModel from '../models/userModel.js';
 import sendJSON from '../utils/sendJson.js';
 import getBody from '../utils/getBody.js';
 export const permissionController = {
@@ -48,8 +49,8 @@ export const permissionController = {
     //Phê duyệt hoặc Từ chối yêu cầu (Chỉ Admin)
     handlePermissionRequest: async(req, res) =>{
         try {
-            const { requestId, action } = await getBody(req); // action: 'APPROVE' hoặc 'REJECT'
-
+            const { requestId, action } = await getBody(req);
+            //kiểm tra xem là approve hay reject
             if (!requestId || !['APPROVE', 'REJECT'].includes(action)) {
             return sendJSON(res, 400, { message: 'Dữ liệu không hợp lệ' });
             }
