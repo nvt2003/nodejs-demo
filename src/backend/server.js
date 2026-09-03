@@ -77,7 +77,7 @@ const server = http.createServer(async (req, res) => {
                 req,
                 res,
                 userId
-            ));
+            )(req, res));
         }
 
         //=========allow edit=======================
@@ -108,14 +108,14 @@ const server = http.createServer(async (req, res) => {
             // const url = new URL(req.url, `${HOST}:${PORT}`);
 
             // const userId = url.pathname.split("/")[3];
-
+            
             const userId = req.url.split("/")[3];
             return await checkRole(['admin','edit'],
                 userController.updateUser(
                 req,
                 res,
                 userId
-            ));
+            )(req, res));
         }
         // DELETE /api/users
         if (req.method === "DELETE" && req.url.startsWith("/api/users/")) {
@@ -126,7 +126,7 @@ const server = http.createServer(async (req, res) => {
                 req,
                 res,
                 userId
-            ));
+            )(req, res));
         }
         //route POST /api/images
         if (req.method === "POST" && req.url === "/api/images") {
