@@ -1,6 +1,6 @@
 import userModel from '../models/userModel.js';
 import { createSession, destroySession } from '../utils/session.js';
-import sendJSON from '../utils/sendJson.js';
+import sendJSON, { sendJSONWithCookies } from '../utils/sendJson.js';
 import getBody from '../utils/getBody.js';
 
 
@@ -46,7 +46,7 @@ export const authController = {
             'Set-Cookie': 'sessionId=; HttpOnly; Path=/; Max-Age=0'
             };
 
-            return sendJSON(res, 200, { message: 'Đăng xuất thành công' }, cookieHeader);
+            return sendJSONWithCookies(req,res, 200, { message: 'Đăng xuất thành công' }, cookieHeader);
         } catch (error) {
             return sendJSON(res, 500, { message: 'Lỗi máy chủ', error: error.message });
         }

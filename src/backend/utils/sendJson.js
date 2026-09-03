@@ -9,5 +9,13 @@ function sendJSON(res, statusCode, data, headers = {}) {
 
     res.end(JSON.stringify(data));
 }
+export function sendJSONWithCookies (req, res, statusCode, data, cookieHeaders = {}) {
+    const origin = req.headers?.origin || "*";
 
+    sendJSON(res, statusCode, data, {
+        "Access-Control-Allow-Origin": origin,
+        "Access-Control-Allow-Credentials": "true",
+        ...cookieHeaders
+    });
+}
 export default sendJSON;
