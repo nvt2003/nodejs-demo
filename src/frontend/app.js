@@ -421,8 +421,8 @@ cancelBtn.addEventListener(
 
     }
 );
-exportBtn.addEventListener("click", function () {
-    UserApi.exportCSV();
+exportBtn.addEventListener("click", async function () {
+    await UserApi.exportCSV();
 });
 importBtn.addEventListener("click", function () {
     csvFileInput.click();
