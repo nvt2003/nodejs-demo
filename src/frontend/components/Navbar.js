@@ -1,4 +1,5 @@
 import UserApi from "../services/userApi.js";
+import AuthApi from "../services/authApi.js";
 
 const Navbar = {
     render() {
@@ -98,9 +99,14 @@ const Navbar = {
 
         //Xử lý ĐĂNG XUẤT
         if (logoutBtn) {
-            logoutBtn.addEventListener("click", () => {
-                localStorage.removeItem("user");
-                alert("Đã đăng xuất!");
+            logoutBtn.addEventListener("click", async() => {
+                const res = await AuthApi.logout()
+                if (res?.status===200){
+                    localStorage.removeItem("user");
+                    alert("Đã đăng xuất!");
+                }else{
+                    alert("Đăng xuất thất bại!")
+                }
                 window.location.reload();
             });
         }
