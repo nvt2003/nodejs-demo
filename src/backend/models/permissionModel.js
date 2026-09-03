@@ -45,6 +45,30 @@ const permissionModel = {
     const query = 'SELECT * FROM permission_requests WHERE id = ?';
     const [rows] = await connection.query(query, [requestId]);
     return rows[0] || null;
+  },
+  // Lấy danh sách người dùng đã được cấp quyền (trừ 'admin')
+  getUsersWithRoles: async () => {
+    const query = `
+      SELECT id, name, email, role, avatar
+      FROM users
+      WHERE role IS NOT NULL 
+        AND role != '' 
+        AND LOWER(role) != 'admin'
+      ORDER BY id DESC
+    `;
+    const [rows] = await connection.query(query);
+    return rows;
+  },
+
+  // Thu hồi/Hủy cấp quyền của 1 user bằng cách xóa role
+  revokeRole: async (userId) => {
+    const query = `
+      UPDATE users 
+      SET role = '' 
+      WHERE id = ? AND LOWER(role) != 'admin'
+    `;
+    const [results] = await connection.query(query, [userId]);
+    return results.affectedRows > 0;
   }
 };
 

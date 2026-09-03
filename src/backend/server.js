@@ -135,14 +135,23 @@ const server = http.createServer(async (req, res) => {
         }
 
         //=========admin=======================
-        // GET api/permission-requests
+        // GET /api/permission-requests
         if (req.method === 'GET' && req.url === '/api/permission-requests') {
             return await checkRole(['admin'], permissionController.getPendingRequests)(req, res);
         }
 
-        // POST api/handle-permission
+        // POST /api/handle-permission
         if (req.method === 'POST' && req.url === '/api/handle-permission') {
             return await checkRole(['admin'], permissionController.handlePermissionRequest)(req, res);
+        }
+        // GET /api/user-with-roles
+        if (req.method === 'GET' && req.url === '/api/users-with-roles') {
+        return await checkRole(['admin'], permissionController.getUsersWithRoles)(req, res);
+        }
+
+        // POST /api/revoke-role
+        if (req.method === 'POST' && req.url === '/api/revoke-role') {
+        return await checkRole(['admin'], permissionController.revokeRole)(req, res);
         }
         // =========================
         // FRONTEND
