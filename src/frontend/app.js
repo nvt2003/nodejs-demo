@@ -32,17 +32,50 @@ const ALLOWED_ROLES = ['admin', 'view', 'edit'];
 document.addEventListener("DOMContentLoaded", async () => {
   initNavbar();
   const user = await checkPermission();
+  const mainContent = document.getElementById("main-content"); 
+  const permissionDeniedBox = document.getElementById("permission-denied-box"); 
+  const notice = document.getElementById("permission-denied-box-notice"); 
+  const requestViewBtn = document.getElementById("request-view-btn"); 
+  const requestEditBtn = document.getElementById("request-edit-btn");
   // Nếu có quyền ('Admin', 'View', hoặc 'Edit') -> Hiển thị UI và tải dữ liệu
   // Nếu không có quyền -> Ẩn nội dung chính, hiện hộp gửi yêu cầu
   if (user) {
-    document.getElementById("main-content").style.display = "block";
-    document.getElementById("permission-denied-box").style.display = "none";
-    loadUsers();
-  } else {
-    document.getElementById("main-content").style.display = "none";
-    document.getElementById("permission-denied-box").style.display = "block";
-    setupRequestButtons();
-  }
+    mainContent.style.display = "block"; 
+    permissionDeniedBox.style.display = "none";
+    loadUsers()
+    //Nếu chỉ có quyền Xem thì hiển thị thông báo và nút yêu câu quyền Sửa
+    if (user.result.role === "view") { 
+        permissionDeniedBox.style.display = "block";
+        notice.innerHTML = ` 
+        <h2 style="color: #856404; margin-bottom: 10px"> 
+            Tài khoản của bạn chỉ có quyền Xem (View) 
+        </h2> 
+        <p style="color: #6c757d; 
+        margin-bottom: 20px"> 
+            Bạn có thể xem dữ liệu nhưng không có quyền thực hiện thao tác Sửa. 
+            Vui lòng yêu cầu Quản trị viên cấp quyền Edit nếu cần. 
+        </p> `;
+    } 
+    }else { 
+        mainContent.style.display = "none"; 
+        permissionDeniedBox.style.display = "block"; 
+        notice.innerHTML = ` 
+        <h2 
+        style="color: #dc3545; 
+        margin-bottom: 10px"> 
+            Bạn không có quyền truy cập trang này 
+        </h2> 
+        <p 
+        style="color: #6c757d; 
+        margin-bottom: 20px"> 
+            Vui lòng đăng nhập vào tài khoản có quyền hoặc gửi yêu cầu cấp quyền đến Quản trị viên để tiếp tục. 
+        </p> `;
+        requestViewBtn.style.display = "block"; 
+        requestEditBtn.style.display = "block"; 
+    }
+    
+        setupRequestButtons();
+    
 });
 
 // Hàm kiểm tra Session & Role từ Backend

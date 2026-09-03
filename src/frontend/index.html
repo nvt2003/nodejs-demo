@@ -22,13 +22,15 @@
         class="card"
         style="display: none; text-align: center; padding: 40px 20px"
       >
-        <h2 style="color: #dc3545; margin-bottom: 10px">
-          Bạn không có quyền truy cập trang này
-        </h2>
-        <p style="color: #6c757d; margin-bottom: 20px">
-          Vui lòng đăng nhập vào tài khoản có quyền hoặc gửi yêu cầu cấp quyền
-          đến Quản trị viên để tiếp tục.
-        </p>
+        <div id="permission-denied-box-notice">
+          <h2 style="color: #dc3545; margin-bottom: 10px">
+            Bạn không có quyền truy cập trang này
+          </h2>
+          <p style="color: #6c757d; margin-bottom: 20px">
+            Vui lòng đăng nhập vào tài khoản có quyền hoặc gửi yêu cầu cấp quyền
+            đến Quản trị viên để tiếp tục.
+          </p>
+        </div>
 
         <div style="display: flex; justify-content: center; gap: 15px">
           <button
@@ -59,6 +61,7 @@
           </button>
         </div>
       </div>
+
       <div id="main-content" style="display: none">
         <!-- Form -->
         <div class="card">
