@@ -519,4 +519,3 @@ confirmSendEmailBtn.addEventListener("click", async function () {
         confirmSendEmailBtn.textContent = "Gửi";
     }
 });
-loadUsers();
