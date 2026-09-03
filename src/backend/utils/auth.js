@@ -31,7 +31,7 @@ export function checkRole(allowedRoles = [], handler) {
 
     //Kiểm tra quyền
     if (allowedRoles.length > 0 && !allowedRoles.includes(session.role)) {
-      return sendJSON(res, 403, { message: 'Bạn không có quyền truy cập API này' });
+      return sendJSON(res, 403, { message: 'Bạn không có quyền truy cập chức năng này' });
     }
     req.user = session;
     return await handler(req, res);

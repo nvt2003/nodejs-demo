@@ -3,6 +3,7 @@ import userModel from '../models/userModel.js';
 import sendJSON from '../utils/sendJson.js';
 import getBody from '../utils/getBody.js';
 export const permissionController = {
+    //yêu cầu quyền truy cập
     requestPermission: async(req, res) => {
         try {
             const userId = req.user?.user_id || req.user?.userId;
@@ -25,7 +26,7 @@ export const permissionController = {
             }
 
             const isSuccess = await permissionModel.createRequest(userId, role);
-
+            //gửi yêu cầu thành công
             if (isSuccess) {
             return sendJSON(res, 200, { 
                 message: `Đã gửi yêu cầu xin quyền ${role} thành công. Vui lòng chờ Admin phê duyệt!` 
@@ -38,6 +39,7 @@ export const permissionController = {
             return sendJSON(res, 500, { message: 'Lỗi máy chủ', error: error.message });
         }
     },
+    //lấy danh sách các yêu cầu quyền truy cập
     getPendingRequests: async(req, res) =>{
         try {
             const requests = await permissionModel.getPendingRequests();

@@ -51,6 +51,7 @@ export const authController = {
             return sendJSON(res, 500, { message: 'Lỗi máy chủ', error: error.message });
         }
     },
+    //lấy dữ liệu đăng nhập
     getMe: async(req,res)=>{
         try {
             // Kiểm tra session hợp lệ từ middleware (req.user)
