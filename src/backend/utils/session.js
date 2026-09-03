@@ -31,7 +31,7 @@ export async function getSession(req) {
 //Xóa session khi đăng xuất
 export function destroySession(req) {
   const cookieHeader = req.headers.cookie;
-  //tránh lỗi khi cookie rỗng
+  //Kiểm tra tránh lỗi khi cookie rỗng
   if (!cookieHeader) {
     console.log("Không có cookie");
     return;

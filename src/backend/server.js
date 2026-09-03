@@ -10,7 +10,7 @@ import {checkRole} from "./utils/auth.js"
 import {permissionController} from "./controllers/permissionController.js"
 
 const __filename = fileURLToPath(import.meta.url);
-//CORS
+//=====CORS=====
 function handleCORS(req, res) {
     res.setHeader("Access-Control-Allow-Origin", "*");
     
@@ -27,7 +27,7 @@ function handleCORS(req, res) {
 
     return false;
 }
-//API
+//=====API=====
 const server = http.createServer(async (req, res) => {
     const isOptions = handleCORS(req, res);
     //Kiểm tra và phản hồi Preflight OPTIONS ngay lập tức

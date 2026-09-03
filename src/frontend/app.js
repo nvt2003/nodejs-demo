@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function checkPermission() {
   try {
     const res = await authApi.getMe()
-      // Chưa đăng nhập, không làm gì
+    // Chưa đăng nhập, không làm gì
     if (res.status === 401) {
       return null;
     }
@@ -73,7 +73,7 @@ function setupRequestButtons() {
   if (reqViewBtn) {
     reqViewBtn.onclick = () => sendPermissionRequest("view");
   }
-  //sự kiện yêu cầu quyền sửa
+  //sự kiện yêu cầu quyền xem và được sửa
   if (reqEditBtn) {
     reqEditBtn.onclick = () => sendPermissionRequest("edit");
   }
@@ -89,7 +89,7 @@ async function sendPermissionRequest(requestedRole) {
     alert("Không thể gửi yêu cầu cấp quyền.");
   }
 }
-
+// render navbar
 function initNavbar() {
     const container = document.getElementById("navbar-container");
         // Render HTML của Navbar vào Container
@@ -99,7 +99,7 @@ function initNavbar() {
         Navbar.afterRender();
     }
 }
-
+//Hàm lấy danh sách người dùng
 async function loadUsers() {
     try {
         const {
@@ -116,6 +116,7 @@ async function loadUsers() {
         alert("Không thể kết nối tới server");
     }
 }
+//Hàm load UI danh sách người dùng với html
 function renderUsers(users) {
 
     userList.innerHTML = "";
@@ -174,6 +175,7 @@ function renderUsers(users) {
         userList.appendChild(tr);
     });
 }
+//Xử lí khi submit (Nút 'lưu người dùng' và 'sửa người dùng')
 form.addEventListener(
     "submit",
     async function (event) {
@@ -253,7 +255,7 @@ form.addEventListener(
                 error
             );
             alert(
-                "Không thể kết nối tới server"
+                error||"Có lỗi xảy ra!"
             );
         }
     }
@@ -269,7 +271,7 @@ userList.addEventListener(
         }
         const id =
             button.dataset.id;
-        // Button sửa
+        // gắn hàm cho nút sửa
         if (
             button.classList.contains(
                 "btn-edit"
@@ -277,7 +279,7 @@ userList.addEventListener(
         ) {
             editUser(id);
         }
-        // Button xóa
+        // gắn hàm cho nút xóa
         if (
             button.classList.contains(
                 "btn-delete"
@@ -287,14 +289,14 @@ userList.addEventListener(
         }
     }
 );
-
+//sửa người dùng với id
 async function editUser(id) {
     try {
         const {
             status,
             data
         } = await UserApi.getUser(id);
-        // Không tìm thấy
+        // Không tìm thấy người dùng
         if (status === 404) {
             alert(
                 data.message ||
@@ -302,7 +304,7 @@ async function editUser(id) {
             );
             return;
         }
-        // API lỗi
+        // API lỗi (ngoài 404)
         if (status !== 200) {
             alert(
                 data.message ||
@@ -335,98 +337,75 @@ async function editUser(id) {
             error
         );
         alert(
-            "Không thể kết nối tới server"
+            error||"Có lỗi xảy ra!"
         );
     }
 }
-
+//Xóa người dùng với id
 async function deleteUser(id) {
-
     const confirmDelete =
         confirm(
             `Bạn có chắc muốn xóa người dùng ID ${id}?`
         );
-
-        //xác nhận xóa
+    //xác nhận xóa
     if (!confirmDelete) {
         return;
     }
-
-
     try {
-
         const {
             status,
             data
         } = await UserApi.deleteUser(id);
-
-        //nếu xóa thành công
+        //nếu xóa thành công, thông báo, tải lại danh sách
         if (status === 200) {
-
             alert(
                 data.message ||
                 "Xóa thành công!"
             );
-
-
             await loadUsers();
-
         }
-
         else {
-
             alert(
                 data.message ||
                 "Không thể xóa người dùng!"
             );
-
         }
-
-
     } catch (error) {
-
         console.error(
             "Lỗi deleteUser:",
             error
         );
-
         alert(
-            "Không thể kết nối tới server"
+            error||"Có lỗi xảy ra!"
         );
     }
 }
-
+//reset các trường trong form
 function resetForm() {
-
     form.reset();
-
-
     userIdInput.value =
         "";
-
-
     formTitle.textContent =
         "Thêm người dùng";
-
-
     cancelBtn.style.display =
         "none";
 }
-
+//gán sự kiện reset form
 cancelBtn.addEventListener(
     "click",
     function () {
-
         resetForm();
-
     }
 );
+//gán sự kiện xuất file csv vào nút Export CSV
 exportBtn.addEventListener("click", async function () {
     await UserApi.exportCSV();
 });
+//gán sự kiện nhập file csv vào nút Import CSV
 importBtn.addEventListener("click", function () {
     csvFileInput.click();
 });
+//nhập file csv, thêm người dùng từ danh sách vào db
 csvFileInput.addEventListener("change", async function () {
     const file = csvFileInput.files[0];
     //kiểm tra file tồn tại không
@@ -453,23 +432,23 @@ csvFileInput.addEventListener("change", async function () {
         }
     } catch (error) {
         console.error("Lỗi Import CSV:", error);
-        alert("Có lỗi xảy ra khi import!");
+        alert("Có lỗi xảy ra!");
     } finally {
         csvFileInput.value = "";
     }
 });
-
+//gán sự kiện vào nút gửi mail
 sendEmailBtn.addEventListener("click", function () {
     emailToInput.value = "";
     emailSubjectInput.value = "";
     emailContentInput.value = "";
     emailModal.style.display = "block";
 });
-
+//gán sự kiện tắt form gửi mail
 closeEmailModalBtn.addEventListener("click", function () {
     emailModal.style.display = "none";
 });
-
+//gán sự kiện vào nút gửi mail
 confirmSendEmailBtn.addEventListener("click", async function () {
     const to = emailToInput.value.trim();
     const subject = emailSubjectInput.value.trim();

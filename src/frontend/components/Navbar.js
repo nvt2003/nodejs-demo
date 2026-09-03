@@ -2,6 +2,7 @@ import UserApi from "../services/userApi.js";
 import AuthApi from "../services/authApi.js";
 
 const Navbar = {
+    //load UI navbar
     render() {
         const userJson = localStorage.getItem("user");
         const user = userJson ? JSON.parse(userJson) : null;
@@ -47,7 +48,7 @@ const Navbar = {
             </div>
         `;
     },
-
+    //load sự kiện cho navbar
     afterRender() {
         const openLoginBtn = document.getElementById("open-login-btn");
         const closeLoginBtn = document.getElementById("close-login-btn");
@@ -62,12 +63,12 @@ const Navbar = {
         if (openLoginBtn) openLoginBtn.addEventListener("click", () => loginModal.style.display = "block");
         if (closeLoginBtn) closeLoginBtn.addEventListener("click", () => loginModal.style.display = "none");
 
-        //Xử lý ĐĂNG NHẬP
+        //Xử lý đăng nhập
         if (submitLoginBtn) {
             submitLoginBtn.addEventListener("click", async () => {
                 const email = loginEmail.value.trim();
                 const password = loginPassword.value.trim();
-                //validate
+                //validate email và password
                 if (!email || !password) {
                     alert("Vui lòng nhập đầy đủ thông tin!");
                     return;
@@ -89,18 +90,18 @@ const Navbar = {
                     }
                 } catch (error) {
                     console.error("Lỗi đăng nhập:", error);
-                    alert("Không thể kết nối đến máy chủ!");
+                    alert(error||"Có lỗi xảy ra!");
                 } finally {
                     submitLoginBtn.disabled = false;
                     submitLoginBtn.textContent = "Đăng nhập";
                 }
             });
         }
-
-        //Xử lý ĐĂNG XUẤT
+        //Xử lý đăng xuất
         if (logoutBtn) {
             logoutBtn.addEventListener("click", async() => {
                 const res = await AuthApi.logout()
+                //nếu xóa dữ liệu session trong db thành công thì xóa local storeage
                 if (res?.status===200){
                     localStorage.removeItem("user");
                     alert("Đã đăng xuất!");
@@ -114,6 +115,7 @@ const Navbar = {
 };
 
 export default Navbar;
+//Render navbar
 export function initNavbar() { 
     const container = document.getElementById("navbar-container"); 
     // Render HTML của Navbar 
