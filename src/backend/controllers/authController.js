@@ -40,7 +40,7 @@ export const authController = {
     //Xử lý đăng xuất, xóa phiên đăng nhập
     logout: async(req,res)=>{
         try {
-            await destroySession(req);
+            destroySession(req);
 
             const cookieHeader = {
             'Set-Cookie': 'sessionId=; HttpOnly; Path=/; Max-Age=0'

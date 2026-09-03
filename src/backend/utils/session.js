@@ -29,11 +29,19 @@ export async function getSession(req) {
   return await sessionModel.findValidSession(sessionId);
 }
 export function destroySession(req) {
-  const session = getSession(req);
-  if (session) {
-    // Tìm sessionId để xóa
-    const cookieHeader = req.headers.cookie;
-    const sessionId = Object.fromEntries(cookieHeader.split(';').map(c => c.trim().split('=')))['sessionId'];
-    sessions.delete(sessionId);
+  const cookieHeader = req.headers.cookie;
+  //tránh lỗi khi cookie rỗng
+  if (!cookieHeader) {
+    console.log("Không có cookie");
+    return;
   }
+  const cookies = Object.fromEntries(
+    cookieHeader.split(';').map(c => {
+      const [key, ...v] = c.trim().split('=');
+      return [key, v.join('=')];
+    })
+  );
+
+  const sessionId = cookies['sessionId'];
+  sessionModel.deleteSession(sessionId);
 }

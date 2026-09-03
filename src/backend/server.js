@@ -47,7 +47,7 @@ const server = http.createServer(async (req, res) => {
         }
         //==========required login==========================
         //route POST /logout
-        if (req.method === "POST" && req.url === "/logout") {
+        if (req.method === "POST" && req.url === "/api/logout") {
             return await checkRole([],authController.logout(req,res));
         }
         //route GET /me
@@ -81,8 +81,8 @@ const server = http.createServer(async (req, res) => {
         }
 
         //=========allow edit=======================
-        // GET /api/users/export
-        if (req.method === "GET" && req.url === "/api/users/export") {
+        // POST /api/users/export
+        if (req.method === "POST" && req.url === "/api/users/export") {
             return await checkRole(['admin','edit'],
                 userController.exportCSV)(req, res);
         }
