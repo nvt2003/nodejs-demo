@@ -90,9 +90,8 @@ async function processPermission(requestId, action) {
 
   try {
     const res = await PermissionApi.handlePermission(requestId,action)
-
-    const result = await res.json();
-    alert(result.message);
+    //const result = await res.json();
+    alert(res.data.message);
     // Load lại danh sách
     if (res.status===200) {
       loadPermissionRequests(); 
