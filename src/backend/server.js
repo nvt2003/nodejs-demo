@@ -89,23 +89,19 @@ const server = http.createServer(async (req, res) => {
             // const userId = url.pathname.split("/")[3];
             
             const userId = req.url.split("/")[3];
-            return await checkRole(['admin','edit'],
-                userController.updateUser(
-                req,
-                res,
-                userId
-            )(req, res));
+            return checkRole(
+                ['admin', 'edit'],
+                (req, res) => userController.updateUser(req, res, userId)
+            )(req, res);
         }
         // DELETE /api/users
         if (req.method === "DELETE" && req.url.startsWith("/api/users/")) {
             const userId = req.url.split("/")[3];
 
-            return await checkRole(['admin','edit'],
-                userController.deleteUser(
-                req,
-                res,
-                userId
-            )(req, res));
+            return checkRole(
+                ['admin', 'edit'],
+                (req, res) => userController.deleteUser(req, res, userId)
+            )(req, res);
         }
         //route POST /api/images
         if (req.method === "POST" && req.url === "/api/images") {
@@ -126,12 +122,10 @@ const server = http.createServer(async (req, res) => {
             // const userId = url.pathname.split("/")[3];
 
             const userId = req.url.split("/")[3];
-            return await checkRole(['admin','view','edit'],
-                userController.getUserById(
-                req,
-                res,
-                userId
-            )(req, res));
+            return checkRole(
+                ['admin', 'view', 'edit'],
+                (req, res) => userController.getUserById(req, res, userId)
+            )(req, res);
         }
 
         //=========admin=======================

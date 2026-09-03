@@ -23,6 +23,18 @@ const PermissionApi = {
       method: "POST",
       body: JSON.stringify({ requestId, action })
     });
+  },
+  // GET /api/users-with-roles
+  async getUsersWithRoles(){
+    return request(`${PERMISSION_API}/users-with-roles`)
+  },
+  
+  //POST /api/revoke-role
+  async revokeRole(userId){
+     return request(`${PERMISSION_API}/revoke-role`, {
+        method: 'POST',
+        body: JSON.stringify({ userId })
+      })
   }
 };
 

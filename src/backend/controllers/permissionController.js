@@ -95,16 +95,15 @@ export const permissionController = {
     //Thu hồi/Hủy cấp quyền cho người dùng
     revokeRole: async(req, res) =>{
         try {
-            const userId = req.user?.user_id || req.user?.userId;
+            const {userId} = await getBody(req);
             //Nếu không có thông tin người dùng, trả về lỗi
             if (!userId) {
             return sendJSON(res, 400, { message: 'Thiếu thông tin người dùng (userId)' });
             }
-
             const success = await permissionModel.revokeRole(userId);
             //Nếu không thành công, trả về lỗi
             if (!success) {
-            return sendJSON(res, 400, { message: 'Không thể thu hồi quyền (Người dùng không tồn tại hoặc là Admin)' });
+                return sendJSON(res, 400, { message: 'Không thể thu hồi quyền (Người dùng không tồn tại hoặc là Admin)' });
             }
 
             return sendJSON(res, 200, { message: 'Thu hồi quyền thành công' });
