@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   //Kiểm tra quyền, chỉ admin được truy cập
   if (isAuthorized) {
     loadPermissionRequests();
+    loadAssignedUsers();
   }
   
 });
@@ -102,5 +103,63 @@ async function processPermission(requestId, action) {
     }
   } catch (err) {
     alert('Có lỗi xảy ra!');
+  }
+}
+//Lấy danh sách người dùng đã được cấp quyền
+async function loadAssignedUsers() {
+  try {
+    const res = await PermissionApi.getUsersWithRoles();
+    if (res.status === 200) {
+      const users = res.data?.result || res.data?.data || [];
+      renderAssignedUsers(users);
+    }
+  } catch (err) {
+    console.error('Lỗi tải danh sách người dùng có quyền:', err);
+  }
+}
+//Render dữ liệu danh sách người dùng đã được cấp quyền
+function renderAssignedUsers(users) {
+  const tbody = document.getElementById('assigned-users-list');
+  //Kiểm tra bảng đã tồn tại chưa
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  //Nếu chưa có ai thì hiển thị chưa có
+  if (!users || users.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Chưa có người dùng nào được cấp quyền</td></tr>';
+    return;
+  }
+  //Render bảng danh sách người dùng đã được cấp quyền
+  users.forEach(user => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${user.name}</td>
+      <td>${user.email}</td>
+      <td><b style="color: #28a745;">${user.role==='view'?'Xem':user.role==='edit'?'Sửa':'Không rõ'}</b></td>
+      <td>
+        <button class="btn-revoke" data-id="${user.id}" style="background-color: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer;">Hủy quyền</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Gán sự kiện cho các nút "Hủy quyền"
+  tbody.querySelectorAll('.btn-revoke').forEach(btn => {
+    btn.onclick = () => handleRevokeRole(btn.dataset.id);
+  });
+}
+//Thu hồi/Hủy quyền đã cấp
+async function handleRevokeRole(userId) {
+  //Xác nhận hủy
+  if (!confirm('Bạn có chắc chắn muốn hủy quyền của người dùng này?')) return;
+
+  try {
+    const res = await PermissionApi.revokeRole(userId);
+    alert(res.data?.message || 'Hủy quyền thành công');
+    // Tải lại bảng sau khi hủy
+    if (res.status === 200) {
+      loadAssignedUsers();
+    }
+  } catch (err) {
+    alert('Lỗi khi kết nối tới máy chủ');
   }
 }

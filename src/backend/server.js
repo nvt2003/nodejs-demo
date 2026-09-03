@@ -89,23 +89,19 @@ const server = http.createServer(async (req, res) => {
             // const userId = url.pathname.split("/")[3];
             
             const userId = req.url.split("/")[3];
-            return await checkRole(['admin','edit'],
-                userController.updateUser(
-                req,
-                res,
-                userId
-            )(req, res));
+            return checkRole(
+                ['admin', 'edit'],
+                (req, res) => userController.updateUser(req, res, userId)
+            )(req, res);
         }
         // DELETE /api/users
         if (req.method === "DELETE" && req.url.startsWith("/api/users/")) {
             const userId = req.url.split("/")[3];
 
-            return await checkRole(['admin','edit'],
-                userController.deleteUser(
-                req,
-                res,
-                userId
-            )(req, res));
+            return checkRole(
+                ['admin', 'edit'],
+                (req, res) => userController.deleteUser(req, res, userId)
+            )(req, res);
         }
         //route POST /api/images
         if (req.method === "POST" && req.url === "/api/images") {
@@ -126,23 +122,30 @@ const server = http.createServer(async (req, res) => {
             // const userId = url.pathname.split("/")[3];
 
             const userId = req.url.split("/")[3];
-            return await checkRole(['admin','view','edit'],
-                userController.getUserById(
-                req,
-                res,
-                userId
-            )(req, res));
+            return checkRole(
+                ['admin', 'view', 'edit'],
+                (req, res) => userController.getUserById(req, res, userId)
+            )(req, res);
         }
 
         //=========admin=======================
-        // GET api/permission-requests
+        // GET /api/permission-requests
         if (req.method === 'GET' && req.url === '/api/permission-requests') {
             return await checkRole(['admin'], permissionController.getPendingRequests)(req, res);
         }
 
-        // POST api/handle-permission
+        // POST /api/handle-permission
         if (req.method === 'POST' && req.url === '/api/handle-permission') {
             return await checkRole(['admin'], permissionController.handlePermissionRequest)(req, res);
+        }
+        // GET /api/user-with-roles
+        if (req.method === 'GET' && req.url === '/api/users-with-roles') {
+        return await checkRole(['admin'], permissionController.getUsersWithRoles)(req, res);
+        }
+
+        // POST /api/revoke-role
+        if (req.method === 'POST' && req.url === '/api/revoke-role') {
+        return await checkRole(['admin'], permissionController.revokeRole)(req, res);
         }
         // =========================
         // FRONTEND

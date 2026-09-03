@@ -79,5 +79,36 @@ export const permissionController = {
         } catch (error) {
             return sendJSON(res, 500, { message: 'Lỗi máy chủ', error: error.message });
         }
+    },
+    //Lấy danh sách người dùng đã được cấp quyền
+    getUsersWithRoles: async(req, res) =>{
+        try {
+            const users = await permissionModel.getUsersWithRoles();
+            return sendJSON(res, 200, {
+            message: 'Lấy danh sách người dùng có quyền thành công',
+            result: users
+            });
+        } catch (error) {
+            return sendJSON(res, 500, { message: 'Lỗi máy chủ', error: error.message });
+        }
+    },
+    //Thu hồi/Hủy cấp quyền cho người dùng
+    revokeRole: async(req, res) =>{
+        try {
+            const {userId} = await getBody(req);
+            //Nếu không có thông tin người dùng, trả về lỗi
+            if (!userId) {
+            return sendJSON(res, 400, { message: 'Thiếu thông tin người dùng (userId)' });
+            }
+            const success = await permissionModel.revokeRole(userId);
+            //Nếu không thành công, trả về lỗi
+            if (!success) {
+                return sendJSON(res, 400, { message: 'Không thể thu hồi quyền (Người dùng không tồn tại hoặc là Admin)' });
+            }
+
+            return sendJSON(res, 200, { message: 'Thu hồi quyền thành công' });
+        } catch (error) {
+            return sendJSON(res, 500, { message: 'Lỗi máy chủ', error: error.message });
+        }
     }
 }
