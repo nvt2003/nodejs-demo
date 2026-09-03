@@ -62,7 +62,7 @@ const server = http.createServer(async (req, res) => {
 
         // GET /api/users
         if (req.method === "GET" && req.url === "/api/users") {
-            return await checkRole(['admin','view'],userController.getUsers)(req, res);
+            return await checkRole(['admin','view','edit'],userController.getUsers)(req, res);
         }
         
         // GET /api/users/{id}
@@ -72,7 +72,7 @@ const server = http.createServer(async (req, res) => {
             // const userId = url.pathname.split("/")[3];
 
             const userId = req.url.split("/")[3];
-            return await checkRole(['admin','view'],
+            return await checkRole(['admin','view','edit'],
                 userController.getUserById(
                 req,
                 res,
