@@ -453,7 +453,7 @@ csvFileInput.addEventListener("change", async function () {
         }
     } catch (error) {
         console.error("Lỗi Import CSV:", error);
-        alert("Không thể kết nối tới server!");
+        alert("Có lỗi xảy ra khi import!");
     } finally {
         csvFileInput.value = "";
     }

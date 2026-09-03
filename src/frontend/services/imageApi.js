@@ -11,6 +11,7 @@ async function request(url, options = {}) {
         data
     };
 }
+//POST /api/images
 const imageApi = {
     async uploadImage(formData){
         return await request(

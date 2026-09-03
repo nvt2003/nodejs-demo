@@ -48,13 +48,15 @@ const UserApi = {
             const response = await fetch(`${API}/export`, {
                 method: "POST"
             });
-            //Thông báo lỗi phân quyền
-            if (response.status === 403){
-                alert("Bạn không có quyền truy cập tính năng này!")
-            }
-            //Thông báo các lỗi khác
+            //Thông báo các lỗi
             if (!response.ok) {
-                throw new Error('Lỗi khi tải file từ server');
+                //Thông báo lỗi phân quyền
+                if (response.status === 403){
+                    alert("Bạn không có quyền truy cập tính năng này!")
+                    return;
+                }else{
+                    throw new Error('Lỗi khi tải file từ server');
+                }
             }
             const blob = await response.blob();
             const downloadUrl = window.URL.createObjectURL(blob);

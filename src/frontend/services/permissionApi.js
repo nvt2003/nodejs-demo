@@ -4,7 +4,7 @@ import { request } from "./api.js";
 const PERMISSION_API = `${BACKEND_URL}/api`;
 
 const PermissionApi = {
-  // POST /request-permission
+  // POST api/request-permission
   async requestPermission(role) {
     return await request(`${PERMISSION_API}/request-permission`, {
       method: "POST",

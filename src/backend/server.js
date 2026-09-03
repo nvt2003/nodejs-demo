@@ -50,7 +50,7 @@ const server = http.createServer(async (req, res) => {
         if (req.method === "POST" && req.url === "/api/logout") {
             return await checkRole([],authController.logout(req,res));
         }
-        //route GET /me
+        //route GET /api/me
         if (req.method === "GET" && req.url === "/api/me") {
             return await checkRole([],authController.getMe)(req,res);
         }
