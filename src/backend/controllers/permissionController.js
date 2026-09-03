@@ -24,7 +24,10 @@ export const permissionController = {
             if (isPending) {
             return sendJSON(res, 400, { message: `Bạn đã gửi yêu cầu quyền ${role} trước đó và đang chờ duyệt.` });
             }
-
+            const uRole = await userModel.getRoleById(userId);
+            if (uRole.role == role){
+                return sendJSON(res,400, {message:`Bạn đã có quyền ${role==='view'?'xem (view)':role==='edit'?'sửa (edit)':''}`})
+            }
             const isSuccess = await permissionModel.createRequest(userId, role);
             //gửi yêu cầu thành công
             if (isSuccess) {
