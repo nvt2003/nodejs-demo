@@ -28,6 +28,7 @@ export async function getSession(req) {
 
   return await sessionModel.findValidSession(sessionId);
 }
+//Xóa session khi đăng xuất
 export function destroySession(req) {
   const cookieHeader = req.headers.cookie;
   //tránh lỗi khi cookie rỗng

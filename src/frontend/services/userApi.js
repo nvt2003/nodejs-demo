@@ -42,12 +42,17 @@ const UserApi = {
             }
         );
     },
-
+    // POST /api/export
     async exportCSV() {
         try {
             const response = await fetch(`${API}/export`, {
                 method: "POST"
             });
+            //Thông báo lỗi phân quyền
+            if (response.status === 403){
+                alert("Bạn không có quyền truy cập tính năng này!")
+            }
+            //Thông báo các lỗi khác
             if (!response.ok) {
                 throw new Error('Lỗi khi tải file từ server');
             }
@@ -65,6 +70,7 @@ const UserApi = {
             alert('Không thể xuất file CSV: ' + error.message);
         }
     },
+    //POST /api/import
     async importCSV(formData) {
         const response = await fetch(`${API}/import`, {
             method: "POST",
