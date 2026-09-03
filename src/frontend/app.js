@@ -1,5 +1,7 @@
 import UserApi from "./services/userApi.js";
 import imageApi from "./services/imageApi.js";
+import permissionApi from "./services/permissionApi.js";
+import authApi from "./services/authApi.js";
 import Navbar from './components/Navbar.js';
 const form = document.getElementById("user-form");
 
@@ -26,19 +28,77 @@ const emailModal = document.getElementById("email-modal");
 const closeEmailModalBtn = document.getElementById("close-email-modal");
 const confirmSendEmailBtn = document.getElementById("confirm-send-email");
 
+const ALLOWED_ROLES = ['admin', 'view', 'edit'];
+document.addEventListener("DOMContentLoaded", async () => {
+  initNavbar();
+  const user = await checkPermission();
+  // Nếu có quyền ('Admin', 'View', hoặc 'Edit') -> Hiển thị UI và tải dữ liệu
+  // Nếu không có quyền -> Ẩn nội dung chính, hiện hộp gửi yêu cầu
+  if (user) {
+    document.getElementById("main-content").style.display = "block";
+    document.getElementById("permission-denied-box").style.display = "none";
+    loadUsers();
+  } else {
+    document.getElementById("main-content").style.display = "none";
+    document.getElementById("permission-denied-box").style.display = "block";
+    setupRequestButtons();
+  }
+});
+
+// Hàm kiểm tra Session & Role từ Backend
+async function checkPermission() {
+  try {
+    const res = await authApi.getMe()
+      // Chưa đăng nhập, không làm gì
+    if (res.status === 401) {
+      return null;
+    }
+    const data = res.data
+    // Kiểm tra xem role của user có thuộc danh sách được phép không
+    if (data && ALLOWED_ROLES.includes(data.result.role)) {
+      return data;
+    }
+    return null;
+  } catch (err) {
+    console.error("Lỗi xác thực quyền:", err);
+    return null;
+  }
+}
+
+//Lắng nghe sự kiện cho các nút Yêu cầu quyền (View / Edit)
+function setupRequestButtons() {
+  const reqViewBtn = document.getElementById("request-view-btn");
+  const reqEditBtn = document.getElementById("request-edit-btn");
+    //sự kiện yêu cầu quyền xem
+  if (reqViewBtn) {
+    reqViewBtn.onclick = () => sendPermissionRequest("view");
+  }
+  //sự kiện yêu cầu quyền sửa
+  if (reqEditBtn) {
+    reqEditBtn.onclick = () => sendPermissionRequest("edit");
+  }
+}
+
+//Hàm gửi API yêu cầu quyền lên Server
+async function sendPermissionRequest(requestedRole) {
+  try {
+    const res = await permissionApi.requestPermission(requestedRole)
+    // const result = await res.json();
+    alert(res.data.message);
+  } catch (err) {
+    alert("Không thể gửi yêu cầu cấp quyền.");
+  }
+}
+
 function initNavbar() {
     const container = document.getElementById("navbar-container");
-    if (container) {
         // Render HTML của Navbar vào Container
+    if (container) {
         container.innerHTML = Navbar.render();
         //Kích hoạt bắt sự kiện Đăng xuất/Đăng nhập
         Navbar.afterRender();
     }
 }
-// Chạy hàm init navbar khi trang web tải xong
-document.addEventListener("DOMContentLoaded", () => {
-    initNavbar();
-});
 
 async function loadUsers() {
     try {
@@ -77,10 +137,9 @@ function renderUsers(users) {
         let imageHTML = "Không có ảnh";
         if (user.avatar || user.image) {
             const imagePath = user.avatar || user.image;
-            // Nối trực tiếp nếu backend đã trả về kèm tiền tố /uploads/
             const src = imagePath.startsWith('http') 
                 ? imagePath 
-                : `http://localhost:3000${imagePath.startsWith('/') ? '' : '/'}${imagePath}`;
+                : ``;
 
             imageHTML = `<img src="${src}" class="avatar" alt="Avatar">`;
         }
@@ -460,4 +519,3 @@ confirmSendEmailBtn.addEventListener("click", async function () {
         confirmSendEmailBtn.textContent = "Gửi";
     }
 });
-loadUsers();

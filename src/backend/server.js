@@ -5,6 +5,9 @@ const PORT = process.env.PORT
 import sendJSON from './utils/sendJson.js'
 import {ImageController} from "./controllers/imageController.js";
 import serveStatic from "./serveStatic.js";
+import { authController } from "./controllers/authController.js";
+import {checkRole} from "./utils/auth.js"
+import {permissionController} from "./controllers/permissionController.js"
 
 const __filename = fileURLToPath(import.meta.url);
 //CORS
@@ -37,23 +40,29 @@ const server = http.createServer(async (req, res) => {
                 timestamp: new Date().toISOString()
             });
         }
-
-        // GET /api/users/export
-        if (req.method === "GET" && req.url === "/api/users/export") {
-            return await userController.exportCSV(req, res);
+        
+        //route POST /login
+        if (req.method === "POST" && req.url === "/login") {
+            return await authController.login(req, res);
         }
-        // POST /api/users/import
-        if (req.method === "POST" && req.url === "/api/users/import") {
-            return await userController.importCSV(req, res);
+        //==========required login==========================
+        //route POST /logout
+        if (req.method === "POST" && req.url === "/api/logout") {
+            return await checkRole([],authController.logout(req,res));
         }
-        // POST /api/users/sendEmail
-        if (req.method === "POST" && req.url === "/api/users/sendEmail") {
-            return await userController.sendEmail(req, res);
+        //route GET /me
+        if (req.method === "GET" && req.url === "/api/me") {
+            return await checkRole([],authController.getMe)(req,res);
         }
+        // POST /api/request-permission
+        if (req.method === 'POST' && req.url === '/api/request-permission') {
+            return await checkRole([], permissionController.requestPermission)(req, res);
+        }
+        //=========allow view=======================
 
         // GET /api/users
         if (req.method === "GET" && req.url === "/api/users") {
-            return await userController.getUsers(req, res);
+            return await checkRole(['admin','view'],userController.getUsers)(req, res);
         }
         
         // GET /api/users/{id}
@@ -63,15 +72,35 @@ const server = http.createServer(async (req, res) => {
             // const userId = url.pathname.split("/")[3];
 
             const userId = req.url.split("/")[3];
-            return await userController.getUserById(
+            return await checkRole(['admin','view'],
+                userController.getUserById(
                 req,
                 res,
                 userId
-            );
+            )(req, res));
         }
+
+        //=========allow edit=======================
+        // POST /api/users/export
+        if (req.method === "POST" && req.url === "/api/users/export") {
+            return await checkRole(['admin','edit'],
+                userController.exportCSV)(req, res);
+        }
+        // POST /api/users/import
+        if (req.method === "POST" && req.url === "/api/users/import") {
+            return await checkRole(['admin','edit'],
+                userController.importCSV)(req, res);
+        }
+        // POST /api/users/sendEmail
+        if (req.method === "POST" && req.url === "/api/users/sendEmail") {
+            return await checkRole(['admin','edit'],
+                userController.sendEmail)(req, res);
+        }
+
         // POST /api/users
         if (req.method === "POST" && req.url === "/api/users") {
-            return await userController.createUser(req, res);
+            return await checkRole(['admin','edit'],
+                userController.createUser)(req, res);
         }
         
         // PUT /api/users/{id}
@@ -79,31 +108,40 @@ const server = http.createServer(async (req, res) => {
             // const url = new URL(req.url, `${HOST}:${PORT}`);
 
             // const userId = url.pathname.split("/")[3];
-
+            
             const userId = req.url.split("/")[3];
-            return await userController.updateUser(
+            return await checkRole(['admin','edit'],
+                userController.updateUser(
                 req,
                 res,
                 userId
-            );
+            )(req, res));
         }
         // DELETE /api/users
         if (req.method === "DELETE" && req.url.startsWith("/api/users/")) {
             const userId = req.url.split("/")[3];
 
-            return await userController.deleteUser(
+            return await checkRole(['admin','edit'],
+                userController.deleteUser(
                 req,
                 res,
                 userId
-            );
-        }
-        //route POST /login
-        if (req.method === "POST" && req.url === "/login") {
-            return await userController.checklogin(req, res);
+            )(req, res));
         }
         //route POST /api/images
         if (req.method === "POST" && req.url === "/api/images") {
-            return await ImageController.upload(req, res);
+            return await checkRole(['admin','edit'],
+                ImageController.upload)(req, res);
+        }
+        //=========admin=======================
+        // GET api/permission-requests
+        if (req.method === 'GET' && req.url === '/api/permission-requests') {
+            return await checkRole(['admin'], permissionController.getPendingRequests)(req, res);
+        }
+
+        // POST api/handle-permission
+        if (req.method === 'POST' && req.url === '/api/handle-permission') {
+            return await checkRole(['admin'], permissionController.handlePermissionRequest)(req, res);
         }
         // =========================
         // FRONTEND

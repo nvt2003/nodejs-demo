@@ -13,11 +13,15 @@ export default function serveStatic(req, res) {
         req.url,
         "http://localhost"
     ).pathname;
-    //navigate tới trang chính
-    if (urlPath === "/") {
-        urlPath = "/index.html";
+    const routes = { 
+        "/": "index.html", 
+        "/permission": "pages/permission/permission.html" 
+    };
+    if (routes[urlPath]) { 
+        urlPath = routes[urlPath]; 
+    } else { 
+        urlPath = urlPath.replace(/^\/+/, "");
     }
-
     const filePath = path.join(
         FRONTEND_DIR,
         urlPath
