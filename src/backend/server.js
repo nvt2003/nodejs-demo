@@ -58,28 +58,7 @@ const server = http.createServer(async (req, res) => {
         if (req.method === 'POST' && req.url === '/api/request-permission') {
             return await checkRole([], permissionController.requestPermission)(req, res);
         }
-        //=========allow view=======================
-
-        // GET /api/users
-        if (req.method === "GET" && req.url === "/api/users") {
-            return await checkRole(['admin','view','edit'],userController.getUsers)(req, res);
-        }
         
-        // GET /api/users/{id}
-        if (req.method === "GET" && req.url.startsWith("/api/users/")) {
-            // const url = new URL(req.url, `${HOST}:${PORT}`);
-
-            // const userId = url.pathname.split("/")[3];
-
-            const userId = req.url.split("/")[3];
-            return await checkRole(['admin','view','edit'],
-                userController.getUserById(
-                req,
-                res,
-                userId
-            )(req, res));
-        }
-
         //=========allow edit=======================
         // POST /api/users/export
         if (req.method === "POST" && req.url === "/api/users/export") {
@@ -133,6 +112,28 @@ const server = http.createServer(async (req, res) => {
             return await checkRole(['admin','edit'],
                 ImageController.upload)(req, res);
         }
+        //=========allow view=======================
+
+        // GET /api/users
+        if (req.method === "GET" && req.url === "/api/users") {
+            return await checkRole(['admin','view','edit'],userController.getUsers)(req, res);
+        }
+        
+        // GET /api/users/{id}
+        if (req.method === "GET" && req.url.startsWith("/api/users/")) {
+            // const url = new URL(req.url, `${HOST}:${PORT}`);
+
+            // const userId = url.pathname.split("/")[3];
+
+            const userId = req.url.split("/")[3];
+            return await checkRole(['admin','view','edit'],
+                userController.getUserById(
+                req,
+                res,
+                userId
+            )(req, res));
+        }
+
         //=========admin=======================
         // GET api/permission-requests
         if (req.method === 'GET' && req.url === '/api/permission-requests') {

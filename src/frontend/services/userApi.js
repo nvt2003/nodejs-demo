@@ -42,10 +42,29 @@ const UserApi = {
             }
         );
     },
-    exportCSV() {
-        window.location.href = `${API}/export`;
-    },
 
+    async exportCSV() {
+        try {
+            const response = await fetch(`${API}/export`, {
+                method: "POST"
+            });
+            if (!response.ok) {
+                throw new Error('Lỗi khi tải file từ server');
+            }
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = 'users_export.csv';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(downloadUrl);
+        } catch (error) {
+            console.error('Lỗi export CSV:', error);
+            alert('Không thể xuất file CSV: ' + error.message);
+        }
+    },
     async importCSV(formData) {
         const response = await fetch(`${API}/import`, {
             method: "POST",
