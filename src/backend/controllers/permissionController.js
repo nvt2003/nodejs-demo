@@ -12,23 +12,32 @@ export const permissionController = {
             return sendJSON(res, 401, { message: 'Phiên làm việc không hợp lệ' });
             }
 
-            const { role } = await getBody(req);
+            const { role, isChange } = await getBody(req);
 
-            // Lấy dữ liệu từ Request Body
+            // Kiểm tra quyền hợp lệ
             if (!role || !['view', 'edit', 'admin'].includes(role)) {
             return sendJSON(res, 400, { message: 'Quyền yêu cầu không hợp lệ (Chấp nhận: view, edit, admin)' });
             }
 
-            const isPending = await permissionModel.hasPendingRequest(userId, role);
+            const pending = await permissionModel.hasPendingRequest(userId, role);
             // Kiểm tra trùng lặp yêu cầu đang chờ duyệt
-            if (isPending) {
-            return sendJSON(res, 400, { message: `Bạn đã gửi yêu cầu quyền ${role} trước đó và đang chờ duyệt.` });
+            if (pending&&isChange!=true) {
+            return sendJSON(res, 400, { 
+                message: `Bạn đã gửi yêu cầu cấp quyền trước đó và đang chờ duyệt.`,
+                pendingRole: pending.requested_role
+                });
             }
             const uRole = await userModel.getRoleById(userId);
+            //Kiểm tra xem người dùng đã có quyền đó chưa
             if (uRole.role == role){
                 return sendJSON(res,400, {message:`Bạn đã có quyền ${role==='view'?'xem (view)':role==='edit'?'sửa (edit)':''}`})
             }
-            const isSuccess = await permissionModel.createRequest(userId, role);
+            //Kiểm tra xem người dùng yêu cầu đổi request không
+            if (isChange==true){
+                const isSuccess = await permissionModel.updateRequest(userId, role);
+            }else{
+                const isSuccess = await permissionModel.createRequest(userId, role);
+            }
             //gửi yêu cầu thành công
             if (isSuccess) {
             return sendJSON(res, 200, { 
