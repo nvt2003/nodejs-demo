@@ -6,6 +6,7 @@ const Navbar = {
     render() {
         const userJson = localStorage.getItem("user");
         const user = userJson ? JSON.parse(userJson) : null;
+        console.log(user)
 
         return `
             <header class="main-header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; background-color: #2c3e50; color: #fff;">

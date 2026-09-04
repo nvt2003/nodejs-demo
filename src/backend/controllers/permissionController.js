@@ -120,7 +120,7 @@ export const permissionController = {
             if (!success) {
                 return sendJSON(res, 400, { message: 'Không thể thu hồi quyền (Người dùng không tồn tại hoặc là Admin)' });
             }
-            await destroyAllUserSessions(request.user_id);
+            await destroyAllUserSessions(userId);
             return sendJSON(res, 200, { message: 'Thu hồi quyền thành công' });
         } catch (error) {
             return sendJSON(res, 500, { message: 'Lỗi máy chủ', error: error.message });

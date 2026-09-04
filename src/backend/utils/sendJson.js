@@ -9,13 +9,29 @@ function sendJSON(res, statusCode, data, headers = {}) {
 
     res.end(JSON.stringify(data));
 }
-export function sendJSONWithCookies (req, res, statusCode, data, cookieHeaders = {}) {
-    const origin = req.headers?.origin || "*";
+export function sendJSONWithCookies (res, statusCode, data, cookies = null, customHeaders = {}) {
+  const origin = res.req?.headers?.origin || '*';
 
-    sendJSON(res, statusCode, data, {
-        "Access-Control-Allow-Origin": origin,
-        "Access-Control-Allow-Credentials": "true",
-        ...cookieHeaders
-    });
+  const headers = {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Credentials': 'true',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    ...customHeaders
+  };
+
+  // Xử lý gắn Cookie vào Header (nếu có)
+  if (cookies) {
+    if (Array.isArray(cookies)) {
+      headers['Set-Cookie'] = cookies;
+    } else if (typeof cookies === 'string') {
+      headers['Set-Cookie'] = [cookies];
+    }
+  }
+
+  // 4. Gửi Response
+  res.writeHead(statusCode, headers);
+  res.end(JSON.stringify(data));
 }
 export default sendJSON;

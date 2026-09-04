@@ -83,8 +83,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 async function checkPermission() {
   try {
     const res = await authApi.getMe()
-    // Chưa đăng nhập, không làm gì
+    // Lỗi chưa đăng nhập hoặc session hết hạn
+    // Xóa thông tin localstorage
     if (res.status === 401) {
+        localStorage.removeItem("user");
+        initNavbar()
       return null;
     }
     const data = res.data

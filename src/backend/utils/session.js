@@ -49,5 +49,5 @@ export function destroySession(req) {
 // Xóa tất cả session của 1 user theo userId
 export async function destroyAllUserSessions(userId) {
   if (!userId) return;
-  await sessionModel.deleteSessionsByUserId(userId);
+  await sessionModel.deleteAllUserSessions(userId);
 }
