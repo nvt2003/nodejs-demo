@@ -8,7 +8,7 @@ export const permissionController = {
     requestPermission: async(req, res) => {
         try {
             const userId = req.user?.user_id || req.user?.userId;
-            // Kiểm tra session
+            // Kiểm tra phiên làm việc của người dùng gửi yêu cầu
             if (!userId) {
             return sendJSON(res, 401, { message: 'Phiên làm việc không hợp lệ' });
             }
@@ -16,12 +16,15 @@ export const permissionController = {
             const { role, isChange } = await getBody(req);
 
             // Kiểm tra quyền hợp lệ
+            // cho phép view, edit, admin
             if (!role || !['view', 'edit', 'admin'].includes(role)) {
             return sendJSON(res, 400, { message: 'Quyền yêu cầu không hợp lệ (Chấp nhận: view, edit, admin)' });
             }
 
             const pending = await permissionModel.hasPendingRequest(userId, role);
             // Kiểm tra trùng lặp yêu cầu đang chờ duyệt
+            // Nếu đang có yêu cầu thì không được gửi tiếp
+            // Nếu người dùng yêu cầu đổi quyền được cấp thì bỏ qua bước này
             if (pending&&isChange!=true) {
             return sendJSON(res, 400, { 
                 message: `Bạn đã gửi yêu cầu cấp quyền trước đó và đang chờ duyệt.`,
@@ -35,12 +38,14 @@ export const permissionController = {
             }
             let isSuccess;
             //Kiểm tra xem người dùng có yêu cầu đổi request không
+            //Đúng thì cập nhật yêu cầu
+            //Không thì tạo mới
             if (isChange==true){
                 isSuccess = await permissionModel.updateRequest(userId, role);
             }else{
                 isSuccess = await permissionModel.createRequest(userId, role);
             }
-            //gửi yêu cầu thành công
+            //kiểm tra xem thành công chưa và gửi thông báo
             if (isSuccess) {
             return sendJSON(res, 200, { 
                 message: `Đã gửi yêu cầu xin quyền ${role} thành công. Vui lòng chờ Admin phê duyệt!` 
@@ -78,7 +83,6 @@ export const permissionController = {
             }
             // Kiểm tra người dùng có thay đổi role trong lúc duyệt 
             // Khiến UI render không kịp, thông tin không khớp
-            console.log(role)
             if (request.requested_role!=role){
                 return sendJSON(res, 400,{
                     message:`Thông tin không khớp!
@@ -87,6 +91,7 @@ export const permissionController = {
                 })
             }
             // Cập nhật role mới cho user và đổi trạng thái request thành APPROVED
+            // xóa toàn bộ session cũ để người dùng đăng xuất toàn bộ các thiết bị và reset
             // Ngược lại đổi trạng thái request thành REJECTED
             if (action === 'APPROVE') {
                 await userModel.updateUserRole(request.user_id, request.requested_role);
@@ -126,6 +131,8 @@ export const permissionController = {
             }
             const success = await permissionModel.revokeRole(userId);
             //Nếu không thành công, trả về lỗi
+            //thành công thì thông báo 
+            // và xóa toàn bộ session cũ (bắt đăng xuất toàn bộ các thiết bị để reset)
             if (!success) {
                 return sendJSON(res, 400, { message: 'Không thể thu hồi quyền (Người dùng không tồn tại hoặc là Admin)' });
             }
