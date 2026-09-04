@@ -109,6 +109,7 @@ async function processPermission(requestId, action) {
 async function loadAssignedUsers() {
   try {
     const res = await PermissionApi.getUsersWithRoles();
+    //Kiểm tra lấy danh sách người dùng đã được cấp quyền và render
     if (res.status === 200) {
       const users = res.data?.result || res.data?.data || [];
       renderAssignedUsers(users);
@@ -156,6 +157,7 @@ async function handleRevokeRole(userId) {
     const res = await PermissionApi.revokeRole(userId);
     alert(res.data?.message || 'Hủy quyền thành công');
     // Tải lại bảng sau khi hủy
+    loadAssignedUsers()
     if (res.status === 200) {
       loadAssignedUsers();
     }

@@ -116,9 +116,20 @@ function setupRequestButtons() {
 async function sendPermissionRequest(requestedRole) {
   try {
     const res = await permissionApi.requestPermission(requestedRole)
-    // const result = await res.json();
     alert(res.data.message);
-  } catch (err) {
+    //Kiểm tra xem nếu người dùng yêu cầu quyền khác thì hỏi có muốn đổi quyền xin cấp không
+    if (res.status==400&&res.data?.requestedRole!=requestedRole){
+        //Xác nhận đổi quyền yêu cầu cấp
+        if(confirm(`Bạn có muốn đổi yêu cầu cấp quyền sang ${requestedRole}`)){
+            const changeRes = await permissionApi.requestPermission(requestedRole,true)
+            if(changeRes.status===200){
+                alert(`Đổi sang xin cấp quyền ${requestedRole} thành công`)
+            }else{
+                alert(changeRes.data.message);
+            }
+        }
+    }
+  }catch (err) {
     alert("Không thể gửi yêu cầu cấp quyền.");
   }
 }
