@@ -37,13 +37,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   const notice = document.getElementById("permission-denied-box-notice"); 
   const requestViewBtn = document.getElementById("request-view-btn"); 
   const requestEditBtn = document.getElementById("request-edit-btn");
-  // Nếu có quyền ('Admin', 'View', hoặc 'Edit') -> Hiển thị UI và tải dữ liệu
-  // Nếu không có quyền -> Ẩn nội dung chính, hiện hộp gửi yêu cầu
+  // Nếu có quyền ('Admin', 'View', hoặc 'Edit') 
+  // -> Hiển thị UI và tải danh sách user
+  // Nếu không có quyền -> Ẩn nội dung chính, hiện hộp gửi yêu cầu quyền
   if (user) {
     mainContent.style.display = "block"; 
     permissionDeniedBox.style.display = "none";
     loadUsers()
-    //Nếu chỉ có quyền Xem thì hiển thị thông báo và nút yêu câu quyền Sửa
+    //Nếu chỉ có quyền Xem thì hiển thị thông báo 
+    //và nút yêu câu quyền Sửa
     if (user.result.role === "view") { 
         permissionDeniedBox.style.display = "block";
         requestViewBtn.style.display = "none"; 
@@ -91,7 +93,7 @@ async function checkPermission() {
       return null;
     }
     const data = res.data
-    // Kiểm tra xem role của user có thuộc danh sách được phép không
+    // Kiểm tra xem role của user có thuộc danh sách được phép xem dữ liệu không
     if (data && ALLOWED_ROLES.includes(data.result.role)) {
       return data;
     }
@@ -106,11 +108,13 @@ async function checkPermission() {
 function setupRequestButtons() {
   const reqViewBtn = document.getElementById("request-view-btn");
   const reqEditBtn = document.getElementById("request-edit-btn");
-    //sự kiện yêu cầu quyền xem
+//gắn sự kiện yêu cầu quyền xem
+//call api với quyền 'view'
   if (reqViewBtn) {
     reqViewBtn.onclick = () => sendPermissionRequest("view");
   }
-  //sự kiện yêu cầu quyền xem và được sửa
+  //gắn sự kiện yêu cầu quyền xem và được sửa
+  //call api với quyền 'edit'
   if (reqEditBtn) {
     reqEditBtn.onclick = () => sendPermissionRequest("edit");
   }
@@ -121,12 +125,13 @@ async function sendPermissionRequest(requestedRole) {
   try {
     const res = await permissionApi.requestPermission(requestedRole)
     alert(res.data.message);
-    //Kiểm tra xem nếu người dùng yêu cầu quyền khác thì hỏi có muốn đổi quyền xin cấp không
+    //Kiểm tra xem nếu gặp lỗi trùng lặp yêu cầu 
+    //thì người dùng có muốn thay đổi yêu cầu quyền khác
     if (res.status==400&&res.data?.requestedRole!=requestedRole){
-        //Xác nhận đổi quyền trong yêu cầu cấp quyền
+        //Xác nhận đổi yêu cầu cấp quyền khác
         if(confirm(`Bạn có muốn đổi yêu cầu cấp quyền sang ${requestedRole}`)){
             const changeRes = await permissionApi.requestPermission(requestedRole,true)
-            //Kiểm tra lại xem quyền đã đổi chưa
+            //Kiểm tra lại xem quyền đã đổi chưa và thông báo
             if(changeRes.status===200){
                 alert(`Đổi sang xin cấp quyền ${requestedRole} thành công`)
             }else{
@@ -155,6 +160,7 @@ async function loadUsers() {
             status,
             data
         } = await UserApi.getUsers();
+        //Nếu xảy ra lỗi khi lấy danh sách thì thông báo lỗi bằng alert của trình duyệt
         if (status !== 200) {
             alert(data.message || "Không thể lấy danh sách user");
             return;
@@ -169,7 +175,7 @@ async function loadUsers() {
 function renderUsers(users) {
 
     userList.innerHTML = "";
-    //nếu chưa có người trong db
+    //thông báo nếu chưa có người trong db
     if (!users || users.length === 0) {
         userList.innerHTML = `
             <tr>
@@ -181,6 +187,7 @@ function renderUsers(users) {
 
         return;
     }
+    //render danh sách user
     users.forEach(user => {
         const tr = document.createElement("tr");
         // Nếu user có ảnh
@@ -237,7 +244,8 @@ form.addEventListener(
             password: passwordInput.value,
             avatar: ""
         };
-        //kiểm tra xem có file được tải lên không
+        //upload file lên web lưu trữ 
+        //rồi lấy url sau khi upload thành công
         if (imageInput.files[0]) {
             const imageFormData = new FormData();
             imageFormData.append("image", imageInput.files[0]);
@@ -281,6 +289,8 @@ form.addEventListener(
                 data
             } = result;
             //xử lí response status
+            //nếu thành công thì thông báo, reset form và load lại danh sách
+            //không thì báo lỗi
             if (
                 status === 200 ||
                 status === 201
@@ -309,7 +319,7 @@ form.addEventListener(
         }
     }
 );
-
+//gắn sự kiện cho các nút 'Sửa' và 'Xóa'
 userList.addEventListener(
     "click",
     function (event) {
@@ -345,7 +355,7 @@ async function editUser(id) {
             status,
             data
         } = await UserApi.getUser(id);
-        // Không tìm thấy người dùng
+        // Thông báo nếu không tìm thấy người dùng
         if (status === 404) {
             alert(
                 data.message ||
@@ -353,7 +363,7 @@ async function editUser(id) {
             );
             return;
         }
-        // API lỗi (ngoài 404)
+        // Thông báo lỗi (ngoài 404)
         if (status !== 200) {
             alert(
                 data.message ||
@@ -458,9 +468,10 @@ importBtn.addEventListener("click", function () {
 csvFileInput.addEventListener("change", async function () {
     const file = csvFileInput.files[0];
     //kiểm tra file tồn tại không
+    //nếu không thì bỏ qua
     if (!file) return;
 
-    // Kiểm tra định dạng file
+    // Kiểm tra định dạng file, chỉ cho chọn file .csv
     if (!file.name.endsWith('.csv')) {
         alert("Vui lòng chỉ chọn file có định dạng .csv!");
         csvFileInput.value = "";
@@ -473,6 +484,8 @@ csvFileInput.addEventListener("change", async function () {
     try {
         const { status, data } = await UserApi.importCSV(formData);
       //kiểm tra xem thành công không
+      //nếu thành công thì thông báo, load lại danh sách
+      //không thì báo lỗi
         if (status === 200 || status === 201) {
             alert(data.message || "Import dữ liệu thành công!");
             await loadUsers();
@@ -532,7 +545,9 @@ confirmSendEmailBtn.addEventListener("click", async function () {
             content: content
         });
 
-        // Kiểm tra kết quả linh hoạt với dữ liệu trả về từ hàm request
+        // Kiểm tra kết quả với dữ liệu trả về từ hàm request
+        // gửi thành công thì thông báo và tắt form gửi
+        // không thì giữ form và báo lỗi
         if (res && (res.status === 200 || res.status === 201 || res.success)) {
             alert(res.message || "Gửi email thành công!");
             emailModal.style.display = "none";
