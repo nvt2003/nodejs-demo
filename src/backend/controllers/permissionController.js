@@ -32,11 +32,12 @@ export const permissionController = {
             if (uRole.role == role){
                 return sendJSON(res,400, {message:`Bạn đã có quyền ${role==='view'?'xem (view)':role==='edit'?'sửa (edit)':''}`})
             }
+            let isSuccess;
             //Kiểm tra xem người dùng yêu cầu đổi request không
             if (isChange==true){
-                const isSuccess = await permissionModel.updateRequest(userId, role);
+                isSuccess = await permissionModel.updateRequest(userId, role);
             }else{
-                const isSuccess = await permissionModel.createRequest(userId, role);
+                isSuccess = await permissionModel.createRequest(userId, role);
             }
             //gửi yêu cầu thành công
             if (isSuccess) {
