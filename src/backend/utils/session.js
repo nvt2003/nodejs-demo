@@ -46,3 +46,8 @@ export function destroySession(req) {
   const sessionId = cookies['sessionId'];
   sessionModel.deleteSession(sessionId);
 }
+// Xóa tất cả session của 1 user theo userId
+export async function destroyAllUserSessions(userId) {
+  if (!userId) return;
+  await sessionModel.deleteSessionsByUserId(userId);
+}
