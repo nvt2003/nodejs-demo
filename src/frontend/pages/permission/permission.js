@@ -100,6 +100,7 @@ async function processPermission(requestId, action) {
     // Load lại danh sách
     if (res.status===200) {
       loadPermissionRequests(); 
+      loadAssignedUsers();
     }
   } catch (err) {
     alert('Có lỗi xảy ra!');
@@ -109,6 +110,7 @@ async function processPermission(requestId, action) {
 async function loadAssignedUsers() {
   try {
     const res = await PermissionApi.getUsersWithRoles();
+    //Kiểm tra lấy danh sách người dùng đã được cấp quyền và render
     if (res.status === 200) {
       const users = res.data?.result || res.data?.data || [];
       renderAssignedUsers(users);

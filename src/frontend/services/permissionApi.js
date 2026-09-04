@@ -5,10 +5,10 @@ const PERMISSION_API = `${BACKEND_URL}/api`;
 
 const PermissionApi = {
   // POST api/request-permission
-  async requestPermission(role) {
+  async requestPermission(role, isChange) {
     return await request(`${PERMISSION_API}/request-permission`, {
       method: "POST",
-      body: JSON.stringify({ role })
+      body: JSON.stringify({ role,isChange })
     });
   },
 

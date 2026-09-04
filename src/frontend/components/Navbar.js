@@ -32,6 +32,7 @@ const Navbar = {
             <div id="login-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000;">
                 <div style="background: #fff; width: 350px; margin: 100px auto; padding: 20px; border-radius: 8px; color: #333;">
                     <h3 style="margin-top: 0;">Đăng Nhập</h3>
+                    <form id="login-form">
                     <div style="margin-bottom: 12px;">
                         <label style="display: block; margin-bottom: 4px;">Email:</label>
                         <input type="email" id="login-email" style="width: 100%; padding: 8px; box-sizing: border-box;">
@@ -42,8 +43,9 @@ const Navbar = {
                     </div>
                     <div style="display: flex; justify-content: flex-end; gap: 8px;">
                         <button type="button" id="close-login-btn" style="padding: 8px 16px;">Hủy</button>
-                        <button type="button" id="submit-login-btn" style="padding: 8px 16px; background: #3498db; color: white; border: none; border-radius: 4px;">Đăng nhập</button>
+                        <button type="submit" id="submit-login-btn" style="padding: 8px 16px; background: #3498db; color: white; border: none; border-radius: 4px;">Đăng nhập</button>
                     </div>
+                    </form>
                 </div>
             </div>
         `;

@@ -56,6 +56,12 @@ const userModel = {
     const query = 'UPDATE users SET role = ? WHERE id = ?';
     const [results] = await connection.query(query, [newRole, userId]);
     return results.affectedRows > 0;
-  }
+  },
+  //Lấy role theo id
+  getRoleById: async(id) => {
+    const query = 'SELECT role FROM users WHERE id=?';
+    const [results] = await connection.query(query,[id]);
+    return results[0];
+  },
 }
 export default userModel;
