@@ -44,11 +44,11 @@ const sessionModel = {
 
   // Dọn dẹp các session đã hết hạn (Chạy định kỳ tự động)
   // trả về số lượng dòng bị ảnh hưởng
-  cleanExpiredSessions: async () => {
-    const query = 'DELETE FROM sessions WHERE expires_at <= NOW()';
-    const [results] = await connection.query(query);
-    return results.affectedRows;
-  }
+  // cleanExpiredSessions: async () => {
+  //   const query = 'DELETE FROM sessions WHERE expires_at <= NOW()';
+  //   const [results] = await connection.query(query);
+  //   return results.affectedRows;
+  // }
 };
 
 export default sessionModel;

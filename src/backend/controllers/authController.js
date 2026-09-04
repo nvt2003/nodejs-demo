@@ -26,11 +26,7 @@ export const authController = {
 
             return sendJSON(res, 200, {
                 message: 'Đăng nhập thành công',
-                result: { 
-                    id: user.id, 
-                    name: user.name,
-                    role: user.role 
-                }
+                result: user
         }, cookieHeader);
 
         } catch (error) {
@@ -54,11 +50,15 @@ export const authController = {
     //lấy dữ liệu đăng nhập
     getMe: async(req,res)=>{
         try {
-            // Kiểm tra session hợp lệ từ middleware (req.user)
-            if (!req.user || !req.user.id) {
+            // Kiểm tra sự tồn tại của Cookie header
+            if (!req.headers?.cookie) {
+            return sendJSON(res, 401, { message: 'Không tìm thấy cookie phiên đăng nhập' });
+            }
+            const currentUserId = req.user?.user_id || req.user?.id;
+            // Kiểm tra session hiện tại
+            if (!currentUserId) {
                 return sendJSON(res, 401, { message: 'Phiên làm việc không hợp lệ hoặc đã hết hạn' });
             }
-            const currentUserId = req.user.user_id;
             
             const user = await userModel.getUserById(currentUserId);
             //không tìm được user

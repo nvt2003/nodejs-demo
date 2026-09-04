@@ -71,8 +71,8 @@ function renderPermissionRequests(requests) {
       <td><b style="color: #007bff;">${req.requested_role}</b></td>
       <td>${new Date(req.created_at).toLocaleString()}</td>
       <td>
-        <button class="btn-approve" data-id="${req.id}" style="background-color: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer;">Duyệt</button>
-        <button class="btn-reject" data-id="${req.id}" style="background-color: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer;">Từ chối</button>
+        <button class="btn-approve" data-id="${req.id}" data-role="${req.requested_role}" style="background-color: #28a745; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer;">Duyệt</button>
+        <button class="btn-reject" data-id="${req.id}" data-role="${req.requested_role}" style="background-color: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 3px; cursor: pointer;">Từ chối</button>
       </td>
     `;
     tbody.appendChild(tr);
@@ -80,21 +80,21 @@ function renderPermissionRequests(requests) {
 
   // Gán sự kiện cho các nút Phê duyệt / Từ chối
   tbody.querySelectorAll('.btn-approve').forEach(btn => {
-    btn.onclick = () => processPermission(btn.dataset.id, 'APPROVE');
+    btn.onclick = () => processPermission(btn.dataset.id, 'APPROVE', btn.dataset.role);
   });
   tbody.querySelectorAll('.btn-reject').forEach(btn => {
-    btn.onclick = () => processPermission(btn.dataset.id, 'REJECT');
+    btn.onclick = () => processPermission(btn.dataset.id, 'REJECT', btn.dataset.role);
   });
 }
 
 // Gửi yêu cầu Duyệt hoặc Từ chối lên Server
-async function processPermission(requestId, action) {
+async function processPermission(requestId, action, role) {
   const actionText = action === 'APPROVE' ? 'duyệt' : 'từ chối';
   //Xác nhận đồng ý hoặc từ chối yêu cầu
   if (!confirm(`Bạn có chắc chắn muốn ${actionText} yêu cầu này?`)) return;
 
   try {
-    const res = await PermissionApi.handlePermission(requestId,action)
+    const res = await PermissionApi.handlePermission(requestId,action,role)
     //const result = await res.json();
     alert(res.data.message);
     // Load lại danh sách

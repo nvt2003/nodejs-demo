@@ -18,10 +18,10 @@ const PermissionApi = {
   },
 
   // POST /api/handle-permission
-  async handlePermission(requestId, action) {
+  async handlePermission(requestId, action,role) {
     return await request(`${PERMISSION_API}/handle-permission`, {
       method: "POST",
-      body: JSON.stringify({ requestId, action })
+      body: JSON.stringify({ requestId, action,role })
     });
   },
   // GET /api/users-with-roles
