@@ -10,15 +10,22 @@ const permissionModel = {
     const [results] = await connection.query(query, [userId, requestedRole]);
     return results.affectedRows > 0;
   },
-
-  // Kiểm tra xem user đã có yêu cầu PENDING cho role này chưa (tránh spam gửi trùng)
-  hasPendingRequest: async (userId, requestedRole) => {
+  // Đổi role yêu cầu xin cấp quyền
+  updateRequest: async (userId, requestedRole) => {
     const query = `
-      SELECT id FROM permission_requests 
-      WHERE user_id = ? AND requested_role = ? AND status = 'PENDING'
+      UPDATE permission_requests SET requested_role = ? WHERE user_id = ?
     `;
-    const [rows] = await connection.query(query, [userId, requestedRole]);
-    return rows.length > 0;
+    const [results] = await connection.query(query, [requestedRole,userId]);
+    return results.affectedRows > 0;
+  },
+  // Kiểm tra xem user đã có yêu cầu này chưa (tránh spam gửi trùng)
+  hasPendingRequest: async (userId) => {
+    const query = `
+      SELECT id,requested_role FROM permission_requests 
+      WHERE user_id = ? AND status = 'PENDING'
+    `;
+    const [rows] = await connection.query(query, [userId]);
+    return rows[0];
   },
   //Lấy requests đang chờ duyệt
   getPendingRequests: async () => {
