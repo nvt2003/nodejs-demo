@@ -46,6 +46,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     //Nếu chỉ có quyền Xem thì hiển thị thông báo và nút yêu câu quyền Sửa
     if (user.result.role === "view") { 
         permissionDeniedBox.style.display = "block";
+        requestViewBtn.style.display = "none"; 
         notice.innerHTML = ` 
         <h2 style="color: #856404; margin-bottom: 10px"> 
             Tài khoản của bạn chỉ có quyền Xem (View) 
@@ -53,7 +54,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         <p style="color: #6c757d; 
         margin-bottom: 20px"> 
             Bạn có thể xem dữ liệu nhưng không có quyền thực hiện thao tác Sửa. 
-            Vui lòng yêu cầu Quản trị viên cấp quyền Edit nếu cần. 
+            Vui lòng yêu cầu Quản trị viên cấp quyền Sửa (Edit) nếu cần. 
         </p> `;
     } 
     }else { 
@@ -112,16 +113,17 @@ function setupRequestButtons() {
   }
 }
 
-//Hàm gửi API yêu cầu quyền lên Server
+//Hàm gửi xử lý gửi yêu cầu cấp quyền
 async function sendPermissionRequest(requestedRole) {
   try {
     const res = await permissionApi.requestPermission(requestedRole)
     alert(res.data.message);
     //Kiểm tra xem nếu người dùng yêu cầu quyền khác thì hỏi có muốn đổi quyền xin cấp không
     if (res.status==400&&res.data?.requestedRole!=requestedRole){
-        //Xác nhận đổi quyền yêu cầu cấp
+        //Xác nhận đổi quyền trong yêu cầu cấp quyền
         if(confirm(`Bạn có muốn đổi yêu cầu cấp quyền sang ${requestedRole}`)){
             const changeRes = await permissionApi.requestPermission(requestedRole,true)
+            //Kiểm tra lại xem quyền đã đổi chưa
             if(changeRes.status===200){
                 alert(`Đổi sang xin cấp quyền ${requestedRole} thành công`)
             }else{

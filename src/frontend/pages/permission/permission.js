@@ -100,6 +100,7 @@ async function processPermission(requestId, action) {
     // Load lại danh sách
     if (res.status===200) {
       loadPermissionRequests(); 
+      loadAssignedUsers();
     }
   } catch (err) {
     alert('Có lỗi xảy ra!');
@@ -157,7 +158,6 @@ async function handleRevokeRole(userId) {
     const res = await PermissionApi.revokeRole(userId);
     alert(res.data?.message || 'Hủy quyền thành công');
     // Tải lại bảng sau khi hủy
-    loadAssignedUsers()
     if (res.status === 200) {
       loadAssignedUsers();
     }
