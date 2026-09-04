@@ -65,7 +65,7 @@ export const permissionController = {
     //Phê duyệt hoặc Từ chối yêu cầu (Chỉ Admin)
     handlePermissionRequest: async(req, res) =>{
         try {
-            const { requestId, action } = await getBody(req);
+            const { requestId, action, role } = await getBody(req);
             //kiểm tra dữ liệu, bắt buộc cần id và approve hoặc reject
             if (!requestId || !['APPROVE', 'REJECT'].includes(action)) {
             return sendJSON(res, 400, { message: 'Dữ liệu không hợp lệ' });
@@ -76,7 +76,16 @@ export const permissionController = {
             if (!request || request.status !== 'PENDING') {
             return sendJSON(res, 404, { message: 'Yêu cầu không tồn tại hoặc đã được xử lý' });
             }
-            
+            // Kiểm tra người dùng có thay đổi role trong lúc duyệt 
+            // Khiến UI render không kịp, thông tin không khớp
+            console.log(role)
+            if (request.requested_role!=role){
+                return sendJSON(res, 400,{
+                    message:`Thông tin không khớp!
+                    \nCó thể người dùng đã chuyển sang xin cấp quyền ${request.requested_role} trong lúc duyệt
+                    \nTải lại trang để cập nhật thông tin mới`
+                })
+            }
             // Cập nhật role mới cho user và đổi trạng thái request thành APPROVED
             // Ngược lại đổi trạng thái request thành REJECTED
             if (action === 'APPROVE') {
