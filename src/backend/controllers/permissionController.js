@@ -72,7 +72,7 @@ export const permissionController = {
             }
 
             const request = await permissionModel.getRequestById(requestId);
-            //Kiểm tra request tồn tại không
+            //Kiểm tra request tồn tại hay là đang chờ duyệt không
             if (!request || request.status !== 'PENDING') {
             return sendJSON(res, 404, { message: 'Yêu cầu không tồn tại hoặc đã được xử lý' });
             }

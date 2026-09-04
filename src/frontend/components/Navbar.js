@@ -6,14 +6,13 @@ const Navbar = {
     render() {
         const userJson = localStorage.getItem("user");
         const user = userJson ? JSON.parse(userJson) : null;
-        console.log(user)
 
         return `
             <header class="main-header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; background-color: #2c3e50; color: #fff;">
                 <div class="header-logo" style="font-weight: bold;">
-                    <a href="#" style="color: #fff; text-decoration: none; font-size: 25px;">My App</a>
-                    <a href="/" style="color: #fff; text-decoration: none;">User</a>
-                    <a href="/permission" style="color: #fff; text-decoration: none;">Permission</a>
+                    <a href="#" style="color: #fff; text-decoration: none; font-size: 25px; margin-right:10px; padding-right:10px;border-right: 1px solid #415a72;">My App</a>
+                    <a href="/" style="color: #fff; text-decoration: none; margin-right:10px; padding-right:10px;border-right: 1px solid #415a72;">Người dùng</a>
+                    <a href="/permission" style="color: #fff; text-decoration: none; margin-right:10px; padding-right:10px;border-right: 1px solid #415a72;">Quyền</a>
                 </div>
 
                 <div class="header-user-action" style="display: flex; align-items: center; gap: 12px;">
