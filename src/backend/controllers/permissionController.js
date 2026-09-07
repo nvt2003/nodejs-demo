@@ -18,8 +18,8 @@ export const permissionController = {
             const { role, isChange } = await getBody(req);
 
             // Kiểm tra quyền hợp lệ
-            // cho phép view, edit, admin
-            if (!role || !['view', 'edit', 'admin'].includes(role)) {
+            // cho phép view, edit
+            if (!role || !['view', 'edit'].includes(role)) {
                 return sendJSON(res, 400, { 
                     message: 'Quyền yêu cầu không hợp lệ (Chấp nhận: view, edit, admin)' 
                 });
