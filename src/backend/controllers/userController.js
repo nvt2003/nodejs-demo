@@ -1,7 +1,6 @@
 import userModel from "../models/userModel.js";
 import sendJSON from "../utils/sendJson.js";
 import getBody from "../utils/getBody.js";
-import parseFormData from "../utils/parseFormData.js";
 import csv from 'fast-csv';
 import Busboy from 'busboy';
 import iconv from "iconv-lite";

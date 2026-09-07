@@ -10,14 +10,16 @@ export const permissionController = {
             const userId = req.user?.user_id || req.user?.userId;
             // Kiểm tra phiên làm việc của người dùng gửi yêu cầu
             if (!userId) {
-            return sendJSON(res, 401, { message: 'Phiên làm việc không hợp lệ' });
+                return sendJSON(res, 401, { 
+                    message: 'Phiên làm việc không hợp lệ' 
+                });
             }
 
             const { role, isChange } = await getBody(req);
 
             // Kiểm tra quyền hợp lệ
-            // cho phép view, edit, admin
-            if (!role || !['view', 'edit', 'admin'].includes(role)) {
+            // cho phép view, edit
+            if (!role || !['view', 'edit'].includes(role)) {
                 return sendJSON(res, 400, { 
                     message: 'Quyền yêu cầu không hợp lệ (Chấp nhận: view, edit, admin)' 
                 });
@@ -36,7 +38,9 @@ export const permissionController = {
             const uRole = await userModel.getRoleById(userId);
             //Kiểm tra xem người dùng đã có quyền đó chưa
             if (uRole.role == role){
-                return sendJSON(res,400, {message:`Bạn đã có quyền ${role==='view'?'xem (view)':role==='edit'?'sửa (edit)':''}`})
+                return sendJSON(res,400, {
+                    message:`Bạn đã có quyền ${role==='view'?'xem (view)':role==='edit'?'sửa (edit)':''}`
+                })
             }
             let isSuccess;
             //Kiểm tra xem người dùng có yêu cầu đổi request không
@@ -54,10 +58,14 @@ export const permissionController = {
             });
             }
 
-            return sendJSON(res, 500, { message: 'Gửi yêu cầu thất bại' });
+            return sendJSON(res, 500, { 
+                message: 'Gửi yêu cầu thất bại' 
+            });
 
         } catch (error) {
-            return sendJSON(res, 500, { message: 'Lỗi máy chủ', error: error.message });
+            return sendJSON(res, 500, { 
+                message: 'Lỗi máy chủ', error: error.message 
+            });
         }
     },
     //lấy danh sách các yêu cầu quyền truy cập
@@ -66,7 +74,9 @@ export const permissionController = {
             const requests = await permissionModel.getPendingRequests();
             return sendJSON(res, 200, { data: requests });
         } catch (error) {
-            return sendJSON(res, 500, { message: 'Lỗi máy chủ', error: error.message });
+            return sendJSON(res, 500, { 
+                message: 'Lỗi máy chủ', error: error.message 
+            });
         }
     },
     //Phê duyệt hoặc Từ chối yêu cầu (Chỉ Admin)
@@ -76,13 +86,17 @@ export const permissionController = {
             //kiểm tra dữ liệu vào
             //bắt buộc cần id và approve hoặc reject
             if (!requestId || !['APPROVE', 'REJECT'].includes(action)) {
-                return sendJSON(res, 400, { message: 'Dữ liệu không hợp lệ' });
+                return sendJSON(res, 400, { 
+                    message: 'Dữ liệu không hợp lệ' 
+                });
             }
 
             const request = await permissionModel.getRequestById(requestId);
             //Kiểm tra request tồn tại hay là đang chờ duyệt không
+            //Nếu không thì trả về lỗi 404
             if (!request || request.status !== 'PENDING') {
-                return sendJSON(res, 404, { message: 'Yêu cầu không tồn tại hoặc đã được xử lý' });
+                return sendJSON(res, 404, { 
+                    message: 'Yêu cầu không tồn tại hoặc đã được xử lý' });
             }
             // Kiểm tra người dùng có thay đổi role trong lúc duyệt 
             // thay đổi làm UI render không kịp, thông tin không khớp
@@ -100,16 +114,22 @@ export const permissionController = {
                 await userModel.updateUserRole(request.user_id, request.requested_role);
                 await permissionModel.updateStatus(requestId, 'APPROVED');
                 await destroyAllUserSessions(request.user_id);
-                return sendJSON(res, 200, { message: `Đã duyệt quyền ${request.requested_role} cho người dùng thành công` });
+                return sendJSON(res, 200, { 
+                    message: `Đã duyệt quyền ${request.requested_role} cho người dùng thành công` 
+                });
 
             } else {
                 await permissionModel.updateStatus(requestId, 'REJECTED');
 
-                return sendJSON(res, 200, { message: 'Đã từ chối yêu cầu cấp quyền' });
+                return sendJSON(res, 200, { 
+                    message: 'Đã từ chối yêu cầu cấp quyền' 
+                });
             }
 
         } catch (error) {
-            return sendJSON(res, 500, { message: 'Lỗi máy chủ', error: error.message });
+            return sendJSON(res, 500, { 
+                message: 'Lỗi máy chủ', error: error.message 
+            });
         }
     },
     //Lấy danh sách người dùng đã được cấp quyền
@@ -117,11 +137,13 @@ export const permissionController = {
         try {
             const users = await permissionModel.getUsersWithRoles();
             return sendJSON(res, 200, {
-            message: 'Lấy danh sách người dùng có quyền thành công',
-            result: users
+                message: 'Lấy danh sách người dùng có quyền thành công',
+                result: users
             });
         } catch (error) {
-            return sendJSON(res, 500, { message: 'Lỗi máy chủ', error: error.message });
+            return sendJSON(res, 500, { 
+                message: 'Lỗi máy chủ', error: error.message 
+            });
         }
     },
     //Thu hồi/Hủy cấp quyền cho người dùng
@@ -130,19 +152,27 @@ export const permissionController = {
             const {userId} = await getBody(req);
             //Nếu không có thông tin người dùng, trả về lỗi
             if (!userId) {
-                return sendJSON(res, 400, { message: 'Thiếu thông tin người dùng (userId)' });
+                return sendJSON(res, 400, { 
+                    message: 'Thiếu thông tin người dùng (userId)' 
+                });
             }
             const success = await permissionModel.revokeRole(userId);
             //Nếu không thành công, trả về lỗi
             //thành công thì thông báo 
             //và xóa toàn bộ session cũ (bắt đăng xuất toàn bộ các thiết bị để reset)
             if (!success) {
-                return sendJSON(res, 400, { message: 'Không thể thu hồi quyền (Người dùng không tồn tại hoặc là Admin)' });
+                return sendJSON(res, 400, { 
+                    message: 'Không thể thu hồi quyền (Người dùng không tồn tại hoặc là Admin)' 
+                });
             }
             await destroyAllUserSessions(userId);
-            return sendJSON(res, 200, { message: 'Thu hồi quyền thành công' });
+            return sendJSON(res, 200, { 
+                message: 'Thu hồi quyền thành công' 
+            });
         } catch (error) {
-            return sendJSON(res, 500, { message: 'Lỗi máy chủ', error: error.message });
+            return sendJSON(res, 500, { 
+                message: 'Lỗi máy chủ', error: error.message 
+            });
         }
     }
 }
