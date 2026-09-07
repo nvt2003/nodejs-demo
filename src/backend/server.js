@@ -8,6 +8,7 @@ import serveStatic from "./serveStatic.js";
 import { authController } from "./controllers/authController.js";
 import {checkRole} from "./utils/auth.js"
 import {permissionController} from "./controllers/permissionController.js"
+import sessionModel from "./models/sessonModel.js";
 
 const __filename = fileURLToPath(import.meta.url);
 //=====CORS=====
@@ -179,10 +180,22 @@ const server = http.createServer(async (req, res) => {
         });
     }
 });
+const cleanExpiredSessions = async () => {
+    try {
+        const deletedCount = await sessionModel.cleanExpiredSessions();
+        //đếm số session đã xóa và log lại
+        if (deletedCount > 0) {
+            console.log(
+                `[Session Cleanup] Đã xóa ${deletedCount} session hết hạn`
+            );
+        }
+    } catch (error) {
+        console.error('[Session Cleanup] Lỗi:', error.message);
+    }
+};
+cleanExpiredSessions();
+setInterval(cleanExpiredSessions, 24 * 60 * 60 * 1000);
 
-// server.listen(PORT, () => {
-//     console.log(`API đang chạy tại ${HOST}:${PORT}`);
-// });
 server.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on port ${PORT}`);
 });
