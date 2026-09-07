@@ -1,3 +1,5 @@
+//Gửi email với api của resend
+//mail gửi mặc định là onboarding@resend.dev
 async function sendEmail(to, subject, content) {
     const response = await fetch(
         "https://api.resend.com/emails",

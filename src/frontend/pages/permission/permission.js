@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   initNavbar();
   const isAuthorized = await checkAdminAccess();
   //Kiểm tra quyền, chỉ admin được truy cập
+  //Tải danh sách những user yêu cầu quyền truy cập
+  //Tải danh sách những user đã được duyệt yêu cầu
   if (isAuthorized) {
     loadPermissionRequests();
     loadAssignedUsers();
@@ -25,7 +27,7 @@ async function checkAdminAccess() {
     const data = await res.data.result;
     //Kiểm tra quyền
     //Trang này chỉ admin được truy cập vào
-    //Trả về trang chính
+    //Nếu không phải admin thì trả về trang chính
     if (data.role !== 'admin') {
       alert('Bạn không có quyền truy cập trang này!');
       window.location.href = '/';
@@ -43,10 +45,9 @@ async function checkAdminAccess() {
 async function loadPermissionRequests() {
   try {
     const res = await PermissionApi.getPendingRequests()
-    //Nếu không có danh sách (null) thì bỏ qua render
+    //Nếu api trả về lỗi thì bỏ qua render
     if (res.status!==200) return;
 
-    // const result = await res.json();
     renderPermissionRequests(res.data.data || []);
   } catch (err) {
     console.error('Lỗi tải danh sách yêu cầu:', err);
@@ -59,10 +60,16 @@ function renderPermissionRequests(requests) {
   tbody.innerHTML = '';
   //Nếu không có request nào thì hiển thị không có
   if (requests.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Không có yêu cầu nào đang chờ</td></tr>';
+    tbody.innerHTML = `
+    <tr>
+      <td colspan="5" style="text-align:center;">
+        Không có yêu cầu nào đang chờ
+      </td>
+    </tr>
+    `;
     return;
   }
-  //render danh sách các request
+  //render danh sách các request và các button tương ứng
   requests.forEach(req => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
@@ -78,7 +85,7 @@ function renderPermissionRequests(requests) {
     tbody.appendChild(tr);
   });
 
-  // Gán sự kiện cho các nút Phê duyệt / Từ chối
+  // Gán sự kiện call api cho các nút Phê duyệt / Từ chối
   tbody.querySelectorAll('.btn-approve').forEach(btn => {
     btn.onclick = () => processPermission(btn.dataset.id, 'APPROVE', btn.dataset.role);
   });
@@ -95,9 +102,8 @@ async function processPermission(requestId, action, role) {
 
   try {
     const res = await PermissionApi.handlePermission(requestId,action,role)
-    //const result = await res.json();
     alert(res.data.message);
-    // Load lại danh sách
+    // Load lại danh sách yêu cầu quyền và quyền đã duyệt nếu call api thành công
     if (res.status===200) {
       loadPermissionRequests(); 
       loadAssignedUsers();
@@ -110,7 +116,8 @@ async function processPermission(requestId, action, role) {
 async function loadAssignedUsers() {
   try {
     const res = await PermissionApi.getUsersWithRoles();
-    //Kiểm tra lấy danh sách người dùng đã được cấp quyền và render
+    //Call api thành công lấy danh sách người dùng đã được cấp quyền 
+    //và render theo danh sách đã lấy
     if (res.status === 200) {
       const users = res.data?.result || res.data?.data || [];
       renderAssignedUsers(users);
@@ -122,12 +129,18 @@ async function loadAssignedUsers() {
 //Render dữ liệu danh sách người dùng đã được cấp quyền
 function renderAssignedUsers(users) {
   const tbody = document.getElementById('assigned-users-list');
-  //Kiểm tra bảng đã tồn tại chưa
+  //Kiểm tra bảng có tồn tại không
+  //Không tồn tại thì không thể render nên trả về và không làm gì
   if (!tbody) return;
   tbody.innerHTML = '';
   //Nếu chưa có ai thì hiển thị chưa có
   if (!users || users.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Chưa có người dùng nào được cấp quyền</td></tr>';
+    tbody.innerHTML = `
+    <tr>
+      <td colspan="4" style="text-align:center;">
+        Chưa có người dùng nào được cấp quyền
+      </td>
+    </tr>`;
     return;
   }
   //Render bảng danh sách người dùng đã được cấp quyền
@@ -151,13 +164,13 @@ function renderAssignedUsers(users) {
 }
 //Thu hồi/Hủy quyền đã cấp
 async function handleRevokeRole(userId) {
-  //Xác nhận hủy
+  //Xác nhận hủy/thu hồi quyền đã cấp
   if (!confirm('Bạn có chắc chắn muốn hủy quyền của người dùng này?')) return;
 
   try {
     const res = await PermissionApi.revokeRole(userId);
     alert(res.data?.message || 'Hủy quyền thành công');
-    // Tải lại bảng sau khi hủy
+    // Tải lại bảng quyền đã cấp sau khi hủy
     if (res.status === 200) {
       loadAssignedUsers();
     }

@@ -17,6 +17,7 @@ export default function serveStatic(req, res) {
         "/": "index.html", 
         "/permission": "pages/permission/permission.html" 
     };
+    //lấy đường dẫn tới file fe dựa theo url
     if (routes[urlPath]) { 
         urlPath = routes[urlPath]; 
     } else { 
@@ -34,11 +35,11 @@ export default function serveStatic(req, res) {
     }
 
     fs.readFile(filePath, (err, data) => {
-        //nếu lỗi file path
+        //nếu lỗi file path, hiển thị page not found
         if (err) {
             console.error("Static file error:", err);
             return sendJSON(res, 404, {
-                error: "File not found"
+                error: "Page not found"
             });
         }
 
