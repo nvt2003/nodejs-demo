@@ -12,6 +12,8 @@ export const userController={
         try{
             const users = await userModel.getUsers();
             //Kiểm tra xem đã lấy dữ liệu chưa
+            //thành công thì trả về dữ liệu danh sách users
+            //không thì trả về lỗi
             if (users){
                 return sendJSON(res, 200, {
                     message:'Lấy người dùng thành công!',
@@ -32,9 +34,10 @@ export const userController={
     //lấy thông tin user gồm id, name, email, password, avatar
     getUserById: async (req, res,userId) => {
         try {
-
             const user = await userModel.getUserById(userId);
-
+            //Kiểm tra xem đã lấy dữ liệu user thành công chưa
+            //thành công thì trả về dữ liệu user
+            //không thì trả về lỗi
             if (user) {
                 return sendJSON(res,200,{
                     message: 'Lấy người dùng thành công!',
@@ -54,11 +57,10 @@ export const userController={
             });
         }
     },
-    //tạo user với name, email, password, avatar (url, không bắt buộc)
+    //tạo user với name, email, password, avatar (url không bắt buộc)
     createUser:async(req,res)=>{
         try{
             const { name, email, password, avatar } = await getBody(req)
-            
             //kiểm tra dữ liệu rỗng
             if (!name || !email || !password) {
                 return sendJSON(res, 400, {
@@ -82,20 +84,17 @@ export const userController={
             })
         }
     },
-    //cập nhật user với name, email, password, avatar (url, không bắt buộc)
+    //cập nhật user với name, email, password, avatar (url không bắt buộc)
     updateUser: async (req, res, userId) => {
         try {
             const { name, email, password, avatar } = await getBody(req)
-
             // Kiểm tra dữ liệu rỗng
             if (!name && !email && !password) {
                 return sendJSON(res, 400, {
-                    message: "Vui lòng cung cấp ít nhất một thông tin (name, email, password hoặc avatar) để sửa!"
+                    message: "Vui lòng cung cấp thông tin tên, email, mật khẩu để sửa!"
                 });
             }
-
             const isUpdated = await userModel.updateUser(userId, name, email, password, avatar);
-
             // Nếu update thành công
             if (isUpdated) {
                 return sendJSON(res, 200, {
@@ -114,11 +113,12 @@ export const userController={
             });
         }
     },
-    //delete a user by id
+    //xóa user theo id
     deleteUser:async(req,res,id)=>{
         try{
             const user = await userModel.getUserById(id)
             //Kiểm tra xem dữ liệu tồn tại không
+            //trả về lỗi 404 nếu không tìm thấy
             if (user){
                 //Kiểm tra xem đã xóa thành công chưa
                 if (await userModel.deleteUser(id)){
@@ -143,7 +143,7 @@ export const userController={
             })
         }
     },
-    //Xuất file csv vào thư mục download mặc định của trình duyệt
+    //Xuất file csv tên users_export.csv vào thư mục download mặc định của trình duyệt
     exportCSV: async (req, res) => {
         try {
             const rows = await userModel.getUsers();
@@ -163,7 +163,9 @@ export const userController={
 
         } catch (error) {
             console.error('Lỗi khi export CSV:', error.message);
-            return sendJSON(res, 500, { message: 'Không thể xuất file CSV: ' + error.message });
+            return sendJSON(res, 500, { 
+                message: 'Không thể xuất file CSV: ' + error.message 
+            });
         }
     },
     //nhập dữ liệu từ file csv đã chọn
@@ -172,7 +174,9 @@ export const userController={
             const contentType = req.headers['content-type'] || '';
             //kiểm tra file đúng dạng chưa
             if (!contentType.includes('multipart/form-data')) {
-                return sendJSON(res, 400, { message: 'Vui lòng gửi file dưới dạng multipart/form-data' });
+                return sendJSON(res, 400, { 
+                    message: 'Vui lòng gửi file dưới dạng multipart/form-data' 
+                });
             }
 
             const users = await new Promise((resolve, reject) => {
@@ -187,7 +191,7 @@ export const userController={
                             ignoreEmpty: true 
                         }))
                         .on('data', (row) => {
-                            //nếu hàng tên mà email có dữ liệu
+                            //nếu hàng tên và email có dữ liệu thì thêm dữ liệu user vào danh sách chuẩn bị nhập
                             if (row.name && row.email) {
                                 parsedUsers.push({
                                     name: row.name.trim(),
@@ -214,13 +218,15 @@ export const userController={
                 req.pipe(busboy);
             });
 
-            // 2. Kiểm tra dữ liệu sau khi ĐÃ READ XONG 100%
+            // Kiểm tra dữ liệu sau khi ĐÃ READ XONG 100%
             if (!users || users.length === 0) {
-                return sendJSON(res, 400, { message: 'File CSV trống hoặc không có dữ liệu hợp lệ!' });
+                return sendJSON(res, 400, { 
+                    message: 'File CSV trống hoặc không có dữ liệu hợp lệ!' 
+                });
             }
 
             let successCount = 0;
-            //Tiến hành Insert vào Database bằng userModel.createUser
+            //Tiến hành thêm user theo danh sách đã đọc vào Database 
             for (const user of users) {
                 try {
                     const isCreated = await userModel.createUser(
@@ -229,7 +235,7 @@ export const userController={
                         user.password,
                         user.avatar
                     );
-                    //đếm số dòng insert thành công
+                    //đếm số user thêm thành công
                     if (isCreated) successCount++;
                 } catch (err) {
                     console.error(`Lỗi khi tạo user ${user.email}:`, err.message);
@@ -243,10 +249,13 @@ export const userController={
 
         } catch (error) {
             console.error('Lỗi khi import CSV:', error.message);
-            return sendJSON(res, 500, { message: 'Lỗi import CSV: ' + error.message });
+            return sendJSON(res, 500, { 
+                message: 'Lỗi import CSV: ' + error.message 
+            });
         }
     },
     //gửi mail với resend
+    //mail gửi mặc định của resend: onboarding@resend.dev
     sendEmail: async(req,res)=>{
         const { to, subject, content } = await getBody(req);
         try{
@@ -268,6 +277,7 @@ export const userController={
         }
     },
     //Kiểm tra thông tin đăng nhập
+    //trả về thông tin user gồm id,name,email,avatar,role
     checklogin: async(req,res)=>{
         const {email,password} = await getBody(req);
         try{

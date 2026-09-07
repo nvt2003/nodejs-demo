@@ -26,11 +26,15 @@ export function checkRole(allowedRoles = [], handler) {
       const session = await getSession(req);
       //Kiểm tra đăng nhập
       if (!session) {
-        return sendJSON(res, 401, { message: 'Chưa đăng nhập hoặc phiên làm việc hết hạn' });
+        return sendJSON(res, 401, { 
+          message: 'Chưa đăng nhập hoặc phiên làm việc hết hạn' 
+        });
       }
       //Kiểm tra quyền
       if (allowedRoles.length > 0 && !allowedRoles.includes(session.role)) {
-        return sendJSON(res, 403, { message: 'Bạn không có quyền truy cập chức năng này' });
+        return sendJSON(res, 403, { 
+          message: 'Bạn không có quyền truy cập chức năng này' 
+        });
       }
       req.user = session;
       return await handler(req, res);

@@ -5,35 +5,36 @@ import getBody from '../utils/getBody.js';
 
 
 export const authController = {
-    //Xử lí đăng nhập, lưu thông tin phiên đăng nhập
+    //Xử lí đăng nhập
     //trả về thông tin người đăng nhập
+    //lưu thông tin phiên đăng nhập vào cookies
     login: async(req,res)=>{
         try {
             const { email, password } = await getBody(req);
             //validate
             if (!email || !password) {
-            return sendJSON(res, 400, { message: 'Vui lòng nhập đầy đủ email và mật khẩu' });
+                return sendJSON(res, 400, { message: 'Vui lòng nhập đầy đủ email và mật khẩu' });
             }
             const user = await userModel.checklogin(email,password);
-            // Kiểm tra, xác thực thông tin người dùng
+            // Kiểm tra, xác thực thông tin đăng nhập của người dùng
             if (!user) {
-            return sendJSON(res, 400, { message: 'Email hoặc mật khẩu không chính xác' });
+                return sendJSON(res, 400, { message: 'Email hoặc mật khẩu không chính xác' });
             }
             const sessionId = await createSession(user);
             const cookieHeader = {
-            'Set-Cookie': `sessionId=${sessionId}; HttpOnly; Path=/; SameSite=Lax`
+                'Set-Cookie': `sessionId=${sessionId}; HttpOnly; Path=/; SameSite=Lax`
             };
 
             return sendJSON(res, 200, {
                 message: 'Đăng nhập thành công',
                 result: user
-        }, cookieHeader);
+            }, cookieHeader);
 
         } catch (error) {
             return sendJSON(res, 400, { message: error.message || 'Lỗi xử lý dữ liệu' });
         }
     },
-    //Xử lý đăng xuất, xóa phiên đăng nhập
+    //Xử lý đăng xuất, xóa phiên đăng nhập ở cookies
     logout: async(req,res)=>{
         try {
             destroySession(req);
@@ -42,28 +43,38 @@ export const authController = {
             'Set-Cookie': 'sessionId=; HttpOnly; Path=/; Max-Age=0'
             };
 
-            return sendJSONWithCookies(req,res, 200, { message: 'Đăng xuất thành công' }, cookieHeader);
+            return sendJSONWithCookies(req,res, 200, { 
+                message: 'Đăng xuất thành công' 
+            }, cookieHeader);
         } catch (error) {
-            return sendJSON(res, 500, { message: 'Lỗi máy chủ', error: error.message });
+            return sendJSON(res, 500, { 
+                message: 'Lỗi máy chủ', error: error.message 
+            });
         }
     },
-    //lấy dữ liệu đăng nhập
+    //lấy dữ liệu người đang đăng nhập
     getMe: async(req,res)=>{
         try {
             // Kiểm tra sự tồn tại của Cookie header
             if (!req.headers?.cookie) {
-            return sendJSON(res, 401, { message: 'Không tìm thấy cookie phiên đăng nhập' });
+                return sendJSON(res, 401, { 
+                    message: 'Không tìm thấy cookie phiên đăng nhập' 
+                });
             }
             const currentUserId = req.user?.user_id || req.user?.id;
             // Kiểm tra session hiện tại
             if (!currentUserId) {
-                return sendJSON(res, 401, { message: 'Phiên làm việc không hợp lệ hoặc đã hết hạn' });
+                return sendJSON(res, 401, { 
+                    message: 'Phiên làm việc không hợp lệ hoặc đã hết hạn' 
+                });
             }
             
             const user = await userModel.getUserById(currentUserId);
             //không tìm được user
             if (!user) {
-                return sendJSON(res, 404, { message: 'Tài khoản không tồn tại trên hệ thống' });
+                return sendJSON(res, 404, { 
+                    message: 'Tài khoản không tồn tại trên hệ thống' 
+                });
             }
             return sendJSON(res, 200, {
                 message:"Lấy thông tin thành công",

@@ -18,7 +18,9 @@ export const permissionController = {
             // Kiểm tra quyền hợp lệ
             // cho phép view, edit, admin
             if (!role || !['view', 'edit', 'admin'].includes(role)) {
-            return sendJSON(res, 400, { message: 'Quyền yêu cầu không hợp lệ (Chấp nhận: view, edit, admin)' });
+                return sendJSON(res, 400, { 
+                    message: 'Quyền yêu cầu không hợp lệ (Chấp nhận: view, edit, admin)' 
+                });
             }
 
             const pending = await permissionModel.hasPendingRequest(userId, role);
@@ -26,9 +28,9 @@ export const permissionController = {
             // Nếu đang có yêu cầu thì không được gửi tiếp
             // Nếu người dùng yêu cầu đổi quyền được cấp thì bỏ qua bước này
             if (pending&&isChange!=true) {
-            return sendJSON(res, 400, { 
-                message: `Bạn đã gửi yêu cầu cấp quyền trước đó và đang chờ duyệt.`,
-                pendingRole: pending.requested_role
+                return sendJSON(res, 400, { 
+                    message: `Bạn đã gửi yêu cầu cấp quyền trước đó và đang chờ duyệt.`,
+                    pendingRole: pending.requested_role
                 });
             }
             const uRole = await userModel.getRoleById(userId);
@@ -71,18 +73,19 @@ export const permissionController = {
     handlePermissionRequest: async(req, res) =>{
         try {
             const { requestId, action, role } = await getBody(req);
-            //kiểm tra dữ liệu, bắt buộc cần id và approve hoặc reject
+            //kiểm tra dữ liệu vào
+            //bắt buộc cần id và approve hoặc reject
             if (!requestId || !['APPROVE', 'REJECT'].includes(action)) {
-            return sendJSON(res, 400, { message: 'Dữ liệu không hợp lệ' });
+                return sendJSON(res, 400, { message: 'Dữ liệu không hợp lệ' });
             }
 
             const request = await permissionModel.getRequestById(requestId);
             //Kiểm tra request tồn tại hay là đang chờ duyệt không
             if (!request || request.status !== 'PENDING') {
-            return sendJSON(res, 404, { message: 'Yêu cầu không tồn tại hoặc đã được xử lý' });
+                return sendJSON(res, 404, { message: 'Yêu cầu không tồn tại hoặc đã được xử lý' });
             }
             // Kiểm tra người dùng có thay đổi role trong lúc duyệt 
-            // Khiến UI render không kịp, thông tin không khớp
+            // thay đổi làm UI render không kịp, thông tin không khớp
             if (request.requested_role!=role){
                 return sendJSON(res, 400,{
                     message:`Thông tin không khớp!
@@ -127,12 +130,12 @@ export const permissionController = {
             const {userId} = await getBody(req);
             //Nếu không có thông tin người dùng, trả về lỗi
             if (!userId) {
-            return sendJSON(res, 400, { message: 'Thiếu thông tin người dùng (userId)' });
+                return sendJSON(res, 400, { message: 'Thiếu thông tin người dùng (userId)' });
             }
             const success = await permissionModel.revokeRole(userId);
             //Nếu không thành công, trả về lỗi
             //thành công thì thông báo 
-            // và xóa toàn bộ session cũ (bắt đăng xuất toàn bộ các thiết bị để reset)
+            //và xóa toàn bộ session cũ (bắt đăng xuất toàn bộ các thiết bị để reset)
             if (!success) {
                 return sendJSON(res, 400, { message: 'Không thể thu hồi quyền (Người dùng không tồn tại hoặc là Admin)' });
             }
