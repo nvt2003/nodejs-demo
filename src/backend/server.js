@@ -180,6 +180,7 @@ const server = http.createServer(async (req, res) => {
         });
     }
 });
+//=====Xóa tự động các session hết hạn mỗi ngày=====
 const cleanExpiredSessions = async () => {
     try {
         const deletedCount = await sessionModel.cleanExpiredSessions();
