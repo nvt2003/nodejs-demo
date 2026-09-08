@@ -13,6 +13,14 @@ export default function serveStatic(req, res) {
         req.url,
         "http://localhost"
     ).pathname;
+
+    // Chặn các request từ DevTools/Browser (tránh làm rác terminal)
+    if (urlPath.startsWith("/.well-known")) {
+        return sendJSON(res, 404, { 
+            error: "Not found" 
+        });
+    }
+
     const routes = { 
         "/": "index.html", 
         "/permission": "pages/permission/permission.html" 
