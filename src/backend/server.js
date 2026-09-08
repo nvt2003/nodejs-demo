@@ -1,5 +1,4 @@
 import http from "http";
-import { fileURLToPath } from "node:url";
 import {userController} from "./controllers/userController.js";
 const PORT = process.env.PORT
 import sendJSON from './utils/sendJson.js'
@@ -12,24 +11,20 @@ import sessionModel from "./models/sessonModel.js";
 import { isDuplicateRequest, isRateLimited } from "./utils/rateLimiter.js";
 import { generateRequestSignature } from "./utils/requestSignature.js";
 
-const __filename = fileURLToPath(import.meta.url);
 //=====CORS=====
 function handleCORS(req, res) {
     res.setHeader("Access-Control-Allow-Origin", "*");
-    
     res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-    
     res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-
     // XỬ LÝ PREFLIGHT REQUEST
     if (req.method === "OPTIONS") {
         res.writeHead(200);
         res.end();
         return true; 
     }
-
     return false;
 }
+//Kiểm tra xem request có phải api không
 function isApiRoute(req) {
     return req.url.startsWith('/api/');
 }
@@ -148,9 +143,6 @@ const server = http.createServer(async (req, res) => {
         
         // GET /api/users/{id}
         if (req.method === "GET" && req.url.startsWith("/api/users/")) {
-            // const url = new URL(req.url, `${HOST}:${PORT}`);
-
-            // const userId = url.pathname.split("/")[3];
 
             const userId = req.url.split("/")[3];
             return checkRole(

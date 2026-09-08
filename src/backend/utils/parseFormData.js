@@ -1,5 +1,5 @@
 import Busboy from "busboy";
-
+//Lấy dữ liệu các request chứa file
 function parseFormData(req) {
     return new Promise((resolve, reject) => {
         const busboy = Busboy({

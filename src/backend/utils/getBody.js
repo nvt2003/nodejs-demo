@@ -1,3 +1,4 @@
+//lấy dữ liệu các biến trong request gửi tới
 function getBody(req) {
     return new Promise((resolve, reject) => {
         let body = "";

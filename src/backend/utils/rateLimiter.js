@@ -1,7 +1,4 @@
-// Bộ nhớ lưu trữ số lần request theo IP (Rate Limit)
 const ipRateMap = new Map();
-
-// Bộ nhớ lưu các Request ID đang hoặc vừa xử lý (Idempotency)
 const activeRequests = new Set();
 
 //Chặn Spam dồn dập theo IP (Rate Limiter)
