@@ -11,10 +11,13 @@ const dbConfig = {
   database: process.env.DB_NAME,
   port: process.env.DB_PORT || 3306,
   waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0
+  timezone: '+07:00',
+  dateStrings: true
 };
 
 const pool = mysql.createPool(dbConfig);
+pool.on('connection', (connection) => {
+  connection.query("SET time_zone = '+07:00';");
+});
 
 module.exports = pool;
