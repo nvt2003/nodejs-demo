@@ -46,8 +46,11 @@ async function checkAdminAccess() {
 async function loadPermissionRequests() {
   try {
     const res = await permissionApi.getPendingRequests()
-    //Nếu api trả về lỗi thì bỏ qua render
-    if (res.status!==200) return;
+    //Nếu api trả về lỗi thì bỏ qua lấy danh sách từ api
+    if (res.status!==200) {
+      alert(res?.message||"Đã xảy ra lỗi")
+      return;
+    }
 
     renderPermissionRequests(res.data.data || []);
   } catch (err) {
