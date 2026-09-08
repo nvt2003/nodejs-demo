@@ -21,6 +21,6 @@ export async function request(url, options = {}) {
 
     return {
         status: response.status,
-        data
+        data: data
     };
 }

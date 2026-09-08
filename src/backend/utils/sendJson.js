@@ -29,9 +29,9 @@ export function sendJSONWithCookies (res, statusCode, data, cookies = null, cust
       headers['Set-Cookie'] = [cookies];
     }
   }
-
-  // 4. Gửi Response
+  const body = JSON.stringify(data);
+  headers['Content-Length'] = Buffer.byteLength(body);
   res.writeHead(statusCode, headers);
-  res.end(JSON.stringify(data));
+  res.end(body);
 }
 export default sendJSON;

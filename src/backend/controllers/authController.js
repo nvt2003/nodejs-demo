@@ -37,13 +37,13 @@ export const authController = {
     //Xử lý đăng xuất, xóa phiên đăng nhập ở cookies
     logout: async(req,res)=>{
         try {
-            destroySession(req);
+            await destroySession(req);
 
             const cookieHeader = {
             'Set-Cookie': 'sessionId=; HttpOnly; Path=/; Max-Age=0'
             };
 
-            return sendJSONWithCookies(req,res, 200, { 
+            return sendJSONWithCookies(res, 200, { 
                 message: 'Đăng xuất thành công' 
             }, cookieHeader);
         } catch (error) {

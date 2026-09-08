@@ -16,23 +16,28 @@ const userModel = {
   },
 
   // Sửa dữ liệu (Update)
-  updateUser: async (id, newName, newEmail, newPassword, newAvatar = null) => {
-      let query;
-      let params;
+  updateUser: async (id, newName, newEmail, newPassword = null, newAvatar = null) => {
+    let updates = ['name = ?', 'email = ?'];
+    let params = [newName, newEmail];
 
-      // Nếu có avatar mới thì cập nhật cả avatar, ngược lại giữ nguyên avatar cũ
-      if (newAvatar) {
-          query = 'UPDATE users SET name = ?, email = ?, password = ?, avatar = ? WHERE id = ?';
-          params = [newName, newEmail, newPassword, newAvatar, id];
-      } else {
-          query = 'UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?';
-          params = [newName, newEmail, newPassword, id];
-      }
+    // Chỉ cập nhật mật khẩu nếu newPassword có giá trị
+    if (newPassword && newPassword.trim() !== '') {
+        updates.push('password = ?');
+        params.push(newPassword);
+    }
 
-      const [results] = await connection.query(query, params);
-      return results.affectedRows > 0;
+    // Chỉ cập nhật avatar nếu newAvatar có giá trị
+    if (newAvatar) {
+        updates.push('avatar = ?');
+        params.push(newAvatar);
+    }
+    params.push(id);
+
+    const query = `UPDATE users SET ${updates.join(', ')} WHERE id = ?`;
+    const [results] = await connection.query(query, params);
+
+    return results.affectedRows > 0;
   },
-
   //Xóa dữ liệu (Delete)
   deleteUser: async(id) => {
     const query = 'DELETE FROM users WHERE id = ?';
