@@ -79,6 +79,10 @@ export const userController={
             }
         }catch(error){
             console.log("Lỗi: ",error.message)
+            if (error.message.includes('users.unique_email'))
+                return sendJSON(res,500,{
+                    message:'Email đã tồn tại'
+                })
             return sendJSON(res,500,{
                 message:error.message
             })
