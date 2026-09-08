@@ -464,8 +464,8 @@ cancelBtn.addEventListener(
     }
 );
 //gán sự kiện xuất file csv vào nút Export CSV
-exportBtn.addEventListener("click", async function () {
-    await userApi.exportCSV();
+exportBtn.addEventListener("click", function () {
+    exportCSV();
 });
 //gán sự kiện nhập file csv vào nút Import CSV
 importBtn.addEventListener("click", function () {
@@ -506,6 +506,14 @@ csvFileInput.addEventListener("change", async function () {
         csvFileInput.value = "";
     }
 });
+async function exportCSV(){
+    const response = await userApi.exportCSV();
+    if (response.status==200){
+        alert("Xuất file thành công! Hãy kiểm tra thư mục tải về của bạn.")
+    }else{
+        alert(response.message||"Có lỗi xảy ra")
+    }
+}
 //reset form email và bật modal nhập dữ liệu gửi email
 sendEmailBtn.addEventListener("click", function () {
     emailToInput.value = "";
