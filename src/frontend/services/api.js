@@ -17,8 +17,11 @@ export async function request(url, options = {}) {
             ...options.headers
     }
     });
+    console.log("api.js: ",response.status)
+    if (response.status===429||response.status===409){
+        alert('Bạn đang thao tác quá nhanh');
+    }
     const data = await response.json();
-
     return {
         status: response.status,
         data: data

@@ -9,6 +9,8 @@ import { authController } from "./controllers/authController.js";
 import {checkRole} from "./utils/auth.js"
 import {permissionController} from "./controllers/permissionController.js"
 import sessionModel from "./models/sessonModel.js";
+import { isDuplicateRequest, isRateLimited } from "./utils/rateLimiter.js";
+import { generateRequestSignature } from "./utils/requestSignature.js";
 
 const __filename = fileURLToPath(import.meta.url);
 //=====CORS=====
@@ -28,8 +30,35 @@ function handleCORS(req, res) {
 
     return false;
 }
+function isApiRoute(req) {
+    return req.url.startsWith('/api/');
+}
 //=====API=====
 const server = http.createServer(async (req, res) => {
+    //=======xử lí spam api============
+    if (isApiRoute(req)) {
+        const clientIp = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.socket.remoteAddress;
+        const requestId = generateRequestSignature(req, req.parsedBody);
+
+        // Kiểm tra Rate Limit theo IP (Chặn spam quá nhiều request/giây)
+        // Giới hạn: 10 request / 10 giây
+        if (isRateLimited(clientIp, 10, 10000)) { 
+            return sendJSON(res, 429, {
+                error: 'Too Many Requests',
+                message: 'Bạn đang thao tác quá nhanh. Vui lòng thử lại sau 10 giây!',
+            });
+        }
+
+        // CHẶN TRÙNG LẶP CHO CÁC METHOD THAY ĐỔI DỮ LIỆU (POST, PUT, DELETE)
+        // Bỏ qua kiểm tra Duplicate đối với phương thức GET
+        if (req.method !== 'GET' && requestId && isDuplicateRequest(requestId, 3000)) {
+            return sendJSON(res, 409, {
+                error: 'Conflict',
+                message: 'Yêu cầu này đang được xử lý, vui lòng không nhấn liên tục!',
+            });
+        }
+    }
+    //=======xử lí api============
     const isOptions = handleCORS(req, res);
     //Kiểm tra và phản hồi Preflight OPTIONS ngay lập tức
     if (isOptions) return;
