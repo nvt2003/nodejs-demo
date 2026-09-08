@@ -57,14 +57,14 @@ export const userController={
             });
         }
     },
-    //tạo user với name, email, password, avatar (url không bắt buộc)
+    //tạo user với name, email, password, avatar (avatar không bắt buộc)
     createUser:async(req,res)=>{
         try{
             const { name, email, password, avatar } = await getBody(req)
             //kiểm tra dữ liệu rỗng
             if (!name || !email || !password) {
                 return sendJSON(res, 400, {
-                    message: "Vui lòng cung cấp email hoặc password cần sửa!"
+                    message: "Vui lòng cung cấp tên, email, mật khẩu để tạo!"
                 });
             }
             //Kiểm tra xem đã thêm thành công chưa
@@ -84,14 +84,14 @@ export const userController={
             })
         }
     },
-    //cập nhật user với name, email, password, avatar (url không bắt buộc)
+    //cập nhật user với name, email, password, avatar (password, avatar không bắt buộc)
     updateUser: async (req, res, userId) => {
         try {
-            const { name, email, password, avatar } = await getBody(req)
+            let { name, email, password, avatar } = await getBody(req)
             // Kiểm tra dữ liệu rỗng
-            if (!name && !email && !password) {
+            if (!name && !email) {
                 return sendJSON(res, 400, {
-                    message: "Vui lòng cung cấp thông tin tên, email, mật khẩu để sửa!"
+                    message: "Vui lòng cung cấp thông tin tên, email để sửa!"
                 });
             }
             const isUpdated = await userModel.updateUser(userId, name, email, password, avatar);
