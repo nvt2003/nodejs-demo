@@ -20,6 +20,7 @@ async function checkAdminAccess() {
     const res = await authApi.getMe()
     // Nếu không có thông in người dùng thì đưa về trang chính
     if (res.status !== 200) {
+      alert('Đăng nhập bằng tài khoản có quyền admin để truy cập trang này!');
       window.location.href = "/";
       return false;
     }
@@ -165,11 +166,11 @@ function renderAssignedUsers(users) {
 //Thu hồi/Hủy quyền đã cấp
 async function handleRevokeRole(userId) {
   //Xác nhận hủy/thu hồi quyền đã cấp
-  if (!confirm('Bạn có chắc chắn muốn hủy quyền của người dùng này?')) return;
+  if (!confirm('Bạn có chắc chắn muốn thu hồi quyền của người dùng này?')) return;
 
   try {
     const res = await permissionApi.revokeRole(userId);
-    alert(res.data?.message || 'Hủy quyền thành công');
+    alert(res.data?.message || 'Thu hồi quyền thành công');
     // Tải lại bảng quyền đã cấp sau khi hủy
     if (res.status === 200) {
       loadAssignedUsers();
