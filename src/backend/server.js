@@ -34,6 +34,7 @@ const server = http.createServer(async (req, res) => {
     //Kiểm tra và phản hồi Preflight OPTIONS ngay lập tức
     if (isOptions) return;
     try {
+        //==========các api không yêu cầu đăng nhập=============================
         // Health check
         if (req.method === "GET" && req.url === "/health") {
             return sendJSON(res, 200, {
@@ -46,7 +47,7 @@ const server = http.createServer(async (req, res) => {
         if (req.method === "POST" && req.url === "/login") {
             return await authController.login(req, res);
         }
-        //==========required login==========================
+        //==========các api yêu cầu người dùng đăng nhập==========================
         //route POST /logout
         if (req.method === "POST" && req.url === "/api/logout") {
             return await checkRole([],authController.logout(req,res));
@@ -60,7 +61,7 @@ const server = http.createServer(async (req, res) => {
             return await checkRole([], permissionController.requestPermission)(req, res);
         }
         
-        //=========allow edit=======================
+        //=========các api yêu cầu quyền sửa (edit, admin)=======================
         // POST /api/users/export
         if (req.method === "POST" && req.url === "/api/users/export") {
             return await checkRole(['admin','edit'],
@@ -109,7 +110,7 @@ const server = http.createServer(async (req, res) => {
             return await checkRole(['admin','edit'],
                 ImageController.upload)(req, res);
         }
-        //=========allow view=======================
+        //=========các api yêu cầu quyền xem (view, edit, admin)=======================
 
         // GET /api/users
         if (req.method === "GET" && req.url === "/api/users") {
@@ -129,7 +130,7 @@ const server = http.createServer(async (req, res) => {
             )(req, res);
         }
 
-        //=========admin=======================
+        //=========các api yêu cầu quyền admin=======================
         // GET /api/permission-requests
         if (req.method === 'GET' && req.url === '/api/permission-requests') {
             return await checkRole(['admin'], permissionController.getPendingRequests)(req, res);

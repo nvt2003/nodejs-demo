@@ -1,6 +1,6 @@
 import BACKEND_URL from "../config/config.js";
 const API = `${BACKEND_URL}/api/images`
-
+//api/images không cần gắn header, credentials,..
 async function request(url, options = {}) {
     const response = await fetch(url, options);
 

@@ -82,6 +82,9 @@ const Navbar = {
                 try {
                     const res = await UserApi.login({ email, password });
                     //kiểm tra xem đăng nhập thành công chưa
+                    //thành công thì lưu lại thông tin vào localstorage
+                    //thông báo và load lại trang
+                    //không thành công thì thông báo lỗi
                     if (res && res.status === 200 && res.data?.result) {
                         const user = res.data.result;
                         localStorage.setItem("user", JSON.stringify(user));
@@ -103,7 +106,8 @@ const Navbar = {
         if (logoutBtn) {
             logoutBtn.addEventListener("click", async() => {
                 const res = await AuthApi.logout()
-                //nếu xóa dữ liệu session trong db thành công thì xóa local storeage
+                //nếu xóa dữ liệu session trong db thành công
+                //xóa local storage và thông báo
                 if (res?.status===200){
                     localStorage.removeItem("user");
                     alert("Đã đăng xuất!");

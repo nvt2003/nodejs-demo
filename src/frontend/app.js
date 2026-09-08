@@ -81,12 +81,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     
 });
 
-// Hàm kiểm tra Session & Role từ Backend
+// Gọi api kiểm tra Session & Role từ Backend
 async function checkPermission() {
   try {
     const res = await authApi.getMe()
-    // Lỗi chưa đăng nhập hoặc session hết hạn
-    // Xóa thông tin localstorage
+    // Lỗi không tìm thấy thông tin của session
+    // do chưa đăng nhập hoặc session hết hạn
+    // Xóa thông tin localstorage để người dùng đăng nhập lại
     if (res.status === 401) {
         localStorage.removeItem("user");
         initNavbar()
@@ -94,12 +95,13 @@ async function checkPermission() {
     }
     const data = res.data
     // Kiểm tra xem role của user có thuộc danh sách được phép xem dữ liệu không
+    // view, edit, admin
     if (data && ALLOWED_ROLES.includes(data.result.role)) {
       return data;
     }
     return null;
   } catch (err) {
-    console.error("Lỗi xác thực quyền:", err);
+      console.error("Lỗi xác thực quyền:", err);
     return null;
   }
 }
@@ -109,12 +111,12 @@ function setupRequestButtons() {
   const reqViewBtn = document.getElementById("request-view-btn");
   const reqEditBtn = document.getElementById("request-edit-btn");
 //gắn sự kiện yêu cầu quyền xem
-//call api với quyền 'view'
+//gọi hàm call api yêu cầu quyền 'view'
   if (reqViewBtn) {
     reqViewBtn.onclick = () => sendPermissionRequest("view");
   }
-  //gắn sự kiện yêu cầu quyền xem và được sửa
-  //call api với quyền 'edit'
+  //gắn sự kiện yêu cầu quyền sửa (được xem và sửa)
+  //gọi hàm call api yêu cầu quyền 'edit'
   if (reqEditBtn) {
     reqEditBtn.onclick = () => sendPermissionRequest("edit");
   }
@@ -125,10 +127,11 @@ async function sendPermissionRequest(requestedRole) {
   try {
     const res = await permissionApi.requestPermission(requestedRole)
     alert(res.data.message);
-    //Kiểm tra xem nếu gặp lỗi trùng lặp yêu cầu 
-    //thì người dùng có muốn thay đổi yêu cầu quyền khác
+    // Kiểm tra xem nếu gặp lỗi trùng lặp yêu cầu 
+    // mà yêu cầu quyền khác với cái cũ 
+    // thì người dùng có muốn thay đổi yêu cầu theo quyền mới chọn không
     if (res.status==400&&res.data?.requestedRole!=requestedRole){
-        //Xác nhận đổi yêu cầu cấp quyền khác
+        //Xác nhận đổi yêu cầu cấp quyền mới
         if(confirm(`Bạn có muốn đổi yêu cầu cấp quyền sang ${requestedRole}`)){
             const changeRes = await permissionApi.requestPermission(requestedRole,true)
             //Kiểm tra lại xem quyền đã đổi chưa và thông báo
@@ -146,7 +149,7 @@ async function sendPermissionRequest(requestedRole) {
 // render navbar
 function initNavbar() {
     const container = document.getElementById("navbar-container");
-        // Render HTML của Navbar vào Container
+    // Render HTML của Navbar vào Container
     if (container) {
         container.innerHTML = Navbar.render();
         //Kích hoạt bắt sự kiện Đăng xuất/Đăng nhập
@@ -190,7 +193,8 @@ function renderUsers(users) {
     //render danh sách user
     users.forEach(user => {
         const tr = document.createElement("tr");
-        // Nếu user có ảnh
+        // Nếu user có ảnh thì hiển thị
+        // Không thì hiện "Không có ảnh"
         let imageHTML = "Không có ảnh";
         if (user.avatar || user.image) {
             const imagePath = user.avatar || user.image;
@@ -244,7 +248,7 @@ form.addEventListener(
             password: passwordInput.value,
             avatar: ""
         };
-        //upload file lên web lưu trữ 
+        //upload file lên web lưu trữ qua api/images
         //rồi lấy url sau khi upload thành công
         if (imageInput.files[0]) {
             const imageFormData = new FormData();
@@ -253,6 +257,8 @@ form.addEventListener(
             const imgResponse = await imageApi.uploadImage(imageFormData)
             const { status, data: imgData } = imgResponse;
             //kiểm tra xem upload ảnh thành công chưa
+            //thành công thì lấy url của ảnh cho vào dữ liệu form để thêm/sửa user
+            //không thì throw lỗi
             if (status < 200 || status >= 300 || !imgData.url) {
                 throw new Error(
                     imgData.message || "Upload ảnh thất bại!"
@@ -325,6 +331,7 @@ userList.addEventListener(
     function (event) {
         const button =
             event.target.closest("button");
+        //không tìm thấy nút thì không làm gì
         if (!button) {
             return;
         }
@@ -499,7 +506,7 @@ csvFileInput.addEventListener("change", async function () {
         csvFileInput.value = "";
     }
 });
-//gán sự kiện vào nút gửi mail
+//reset form email và bật modal nhập dữ liệu gửi email
 sendEmailBtn.addEventListener("click", function () {
     emailToInput.value = "";
     emailSubjectInput.value = "";
@@ -511,6 +518,7 @@ closeEmailModalBtn.addEventListener("click", function () {
     emailModal.style.display = "none";
 });
 //gán sự kiện vào nút gửi mail
+//call api gửi mail với nội dung đã nhập
 confirmSendEmailBtn.addEventListener("click", async function () {
     const to = emailToInput.value.trim();
     const subject = emailSubjectInput.value.trim();
