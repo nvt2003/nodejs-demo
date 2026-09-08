@@ -240,53 +240,53 @@ form.addEventListener(
     "submit",
     async function (event) {
         event.preventDefault();
-        const id = userIdInput.value.trim();
-        let avatarUrl = typeof currentAvatarUrl !== "undefined" ? currentAvatarUrl : "";
-        const userData = {
-            name: nameInput.value.trim(),
-            email: emailInput.value.trim(),
-            password: passwordInput.value,
-            avatar: ""
-        };
-        //upload file lên web lưu trữ qua api/images
-        //rồi lấy url sau khi upload thành công
-        if (imageInput.files[0]) {
-            const imageFormData = new FormData();
-            imageFormData.append("image", imageInput.files[0]);
-
-            const imgResponse = await imageApi.uploadImage(imageFormData)
-            const { status, data: imgData } = imgResponse;
-            //kiểm tra xem upload ảnh thành công chưa
-            //thành công thì lấy url của ảnh cho vào dữ liệu form để thêm/sửa user
-            //không thì throw lỗi
-            if (status < 200 || status >= 300 || !imgData.url) {
-                throw new Error(
-                    imgData.message || "Upload ảnh thất bại!"
-                );
-            }
-
-            avatarUrl = imgData.url;
-            userData.avatar=avatarUrl;
-        }
-        // bắt buộc nhập tên
-        if (!userData.name) {
-            alert("Vui lòng nhập tên!");
-            nameInput.focus();
-            return;
-        }
-        // email bắt buộc
-        if (!userData.email) {
-            alert("Vui lòng nhập email!");
-            emailInput.focus();
-            return;
-        }
-        // password bắt buộc
-        if (!id && !userData.password) {
-            alert("Vui lòng nhập mật khẩu!");
-            passwordInput.focus();
-            return;
-        }
         try {
+            const id = userIdInput.value.trim();
+            let avatarUrl = typeof currentAvatarUrl !== "undefined" ? currentAvatarUrl : "";
+            const userData = {
+                name: nameInput.value.trim(),
+                email: emailInput.value.trim(),
+                password: passwordInput.value,
+                avatar: ""
+            };
+            //upload file lên web lưu trữ qua api/images
+            //rồi lấy url sau khi upload thành công
+            if (imageInput.files[0]) {
+                const imageFormData = new FormData();
+                imageFormData.append("image", imageInput.files[0]);
+
+                const imgResponse = await imageApi.uploadImage(imageFormData)
+                const { status, data: imgData } = imgResponse;
+                //kiểm tra xem upload ảnh thành công chưa
+                //thành công thì lấy url của ảnh cho vào dữ liệu form để thêm/sửa user
+                //không thì throw lỗi
+                if (status < 200 || status >= 300 || !imgData.url) {
+                    throw new Error(
+                        imgData.message || "Upload ảnh thất bại!"
+                    );
+                }
+
+                avatarUrl = imgData.url;
+                userData.avatar=avatarUrl;
+            }
+            // bắt buộc nhập tên
+            if (!userData.name) {
+                alert("Vui lòng nhập tên!");
+                nameInput.focus();
+                return;
+            }
+            // email bắt buộc
+            if (!userData.email) {
+                alert("Vui lòng nhập email!");
+                emailInput.focus();
+                return;
+            }
+            // password bắt buộc
+            if (!id && !userData.password) {
+                alert("Vui lòng nhập mật khẩu!");
+                passwordInput.focus();
+                return;
+            }
             const result = id 
             ? await UserApi.updateUser(id, userData) 
             : await UserApi.createUser(userData);
