@@ -1,5 +1,5 @@
-import UserApi from "../services/userApi.js";
-import AuthApi from "../services/authApi.js";
+import userApi from "../services/userApi.js";
+import authApi from "../services/authApi.js";
 
 const Navbar = {
     //load UI navbar
@@ -80,7 +80,7 @@ const Navbar = {
                 submitLoginBtn.textContent = "Đang xử lý...";
 
                 try {
-                    const res = await UserApi.login({ email, password });
+                    const res = await userApi.login({ email, password });
                     //kiểm tra xem đăng nhập thành công chưa
                     //thành công thì lưu lại thông tin vào localstorage
                     //thông báo và load lại trang
@@ -105,7 +105,7 @@ const Navbar = {
         //Xử lý đăng xuất
         if (logoutBtn) {
             logoutBtn.addEventListener("click", async() => {
-                const res = await AuthApi.logout()
+                const res = await authApi.logout()
                 //nếu xóa dữ liệu session trong db thành công
                 //xóa local storage và thông báo
                 if (res?.status===200){

@@ -12,7 +12,7 @@ async function request(url, options = {}) {
     };
 }
 //POST /api/images
-const imageApi = {
+const ImageApi = {
     async uploadImage(formData){
         return await request(
             `${API}`,
@@ -23,4 +23,4 @@ const imageApi = {
         );
     }
 }
-export default imageApi
+export default ImageApi

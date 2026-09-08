@@ -1,4 +1,4 @@
-import {uploadImage} from "../utils/CloudinaryServices.js"
+import {uploadImage} from "../utils/cloudinaryServices.js"
 import parseFormData from "../utils/parseFormData.js";
 import sendJSON from "../utils/sendJson.js"
 

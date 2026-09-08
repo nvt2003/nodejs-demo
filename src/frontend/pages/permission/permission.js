@@ -1,6 +1,6 @@
-import PermissionApi from "../../services/permissionApi.js";
+import permissionApi from "../../services/permissionApi.js";
 import authApi from "../../services/authApi.js"
-import {initNavbar} from "../../components/Navbar.js"
+import {initNavbar} from "../../components/navbar.js"
 document.addEventListener('DOMContentLoaded', async () => {
   initNavbar();
   const isAuthorized = await checkAdminAccess();
@@ -44,7 +44,7 @@ async function checkAdminAccess() {
 // Lấy danh sách các yêu cầu cấp quyền từ Server
 async function loadPermissionRequests() {
   try {
-    const res = await PermissionApi.getPendingRequests()
+    const res = await permissionApi.getPendingRequests()
     //Nếu api trả về lỗi thì bỏ qua render
     if (res.status!==200) return;
 
@@ -101,7 +101,7 @@ async function processPermission(requestId, action, role) {
   if (!confirm(`Bạn có chắc chắn muốn ${actionText} yêu cầu này?`)) return;
 
   try {
-    const res = await PermissionApi.handlePermission(requestId,action,role)
+    const res = await permissionApi.handlePermission(requestId,action,role)
     alert(res.data.message);
     // Load lại danh sách yêu cầu quyền và quyền đã duyệt nếu call api thành công
     if (res.status===200) {
@@ -115,7 +115,7 @@ async function processPermission(requestId, action, role) {
 //Lấy danh sách người dùng đã được cấp quyền
 async function loadAssignedUsers() {
   try {
-    const res = await PermissionApi.getUsersWithRoles();
+    const res = await permissionApi.getUsersWithRoles();
     //Call api thành công lấy danh sách người dùng đã được cấp quyền 
     //và render theo danh sách đã lấy
     if (res.status === 200) {
@@ -168,7 +168,7 @@ async function handleRevokeRole(userId) {
   if (!confirm('Bạn có chắc chắn muốn hủy quyền của người dùng này?')) return;
 
   try {
-    const res = await PermissionApi.revokeRole(userId);
+    const res = await permissionApi.revokeRole(userId);
     alert(res.data?.message || 'Hủy quyền thành công');
     // Tải lại bảng quyền đã cấp sau khi hủy
     if (res.status === 200) {

@@ -1,8 +1,8 @@
-import UserApi from "./services/userApi.js";
+import userApi from "./services/userApi.js";
 import imageApi from "./services/imageApi.js";
 import permissionApi from "./services/permissionApi.js";
 import authApi from "./services/authApi.js";
-import Navbar from './components/Navbar.js';
+import navbar from './components/navbar.js';
 const form = document.getElementById("user-form");
 
 const userIdInput = document.getElementById("user-id");
@@ -151,9 +151,9 @@ function initNavbar() {
     const container = document.getElementById("navbar-container");
     // Render HTML của Navbar vào Container
     if (container) {
-        container.innerHTML = Navbar.render();
+        container.innerHTML = navbar.render();
         //Kích hoạt bắt sự kiện Đăng xuất/Đăng nhập
-        Navbar.afterRender();
+        navbar.afterRender();
     }
 }
 //Hàm lấy danh sách người dùng
@@ -162,7 +162,7 @@ async function loadUsers() {
         const {
             status,
             data
-        } = await UserApi.getUsers();
+        } = await userApi.getUsers();
         //Nếu xảy ra lỗi khi lấy danh sách thì thông báo lỗi bằng alert của trình duyệt
         if (status !== 200) {
             alert(data.message || "Không thể lấy danh sách user");
@@ -288,8 +288,8 @@ form.addEventListener(
                 return;
             }
             const result = id 
-            ? await UserApi.updateUser(id, userData) 
-            : await UserApi.createUser(userData);
+            ? await userApi.updateUser(id, userData) 
+            : await userApi.createUser(userData);
             const {
                 status,
                 data
@@ -361,7 +361,7 @@ async function editUser(id) {
         const {
             status,
             data
-        } = await UserApi.getUser(id);
+        } = await userApi.getUser(id);
         // Thông báo nếu không tìm thấy người dùng
         if (status === 404) {
             alert(
@@ -421,7 +421,7 @@ async function deleteUser(id) {
         const {
             status,
             data
-        } = await UserApi.deleteUser(id);
+        } = await userApi.deleteUser(id);
         //nếu xóa thành công, thông báo, tải lại danh sách
         if (status === 200) {
             alert(
@@ -465,7 +465,7 @@ cancelBtn.addEventListener(
 );
 //gán sự kiện xuất file csv vào nút Export CSV
 exportBtn.addEventListener("click", async function () {
-    await UserApi.exportCSV();
+    await userApi.exportCSV();
 });
 //gán sự kiện nhập file csv vào nút Import CSV
 importBtn.addEventListener("click", function () {
@@ -489,7 +489,7 @@ csvFileInput.addEventListener("change", async function () {
     formData.append("file", file);
 
     try {
-        const { status, data } = await UserApi.importCSV(formData);
+        const { status, data } = await userApi.importCSV(formData);
       //kiểm tra xem thành công không
       //nếu thành công thì thông báo, load lại danh sách
       //không thì báo lỗi
@@ -547,7 +547,7 @@ confirmSendEmailBtn.addEventListener("click", async function () {
     confirmSendEmailBtn.textContent = "Đang gửi...";
 
     try {
-        const res = await UserApi.sendEmail({
+        const res = await userApi.sendEmail({
             to: to,
             subject: subject,
             content: content
