@@ -71,36 +71,42 @@
             <input type="hidden" id="user-id" />
 
             <div class="form-group">
-              <label>Tên người dùng</label>
+              <label title="Bắt buộc">Tên người dùng</label>
 
               <input type="text" id="name" required />
             </div>
 
             <div class="form-group">
-              <label>Email</label>
+              <label title="Bắt buộc">Email</label>
 
               <input type="email" id="email" required />
             </div>
 
             <div class="form-group">
-              <label>Mật khẩu</label>
+              <label
+                title="Bắt buộc, để trống nếu không muốn sửa mà lấy mật khẩu cũ"
+                >Mật khẩu</label
+              >
 
               <input type="password" id="password" />
             </div>
 
             <div class="form-group">
-              <label>Ảnh đại diện</label>
+              <label title="Không bắt buộc, để trống nếu lấy ảnh cũ"
+                >Ảnh đại diện</label
+              >
 
               <input type="file" id="image" accept="image/*" />
             </div>
 
-            <button type="submit">Lưu người dùng</button>
+            <button type="submit" id="submit-form-btn">Lưu người dùng</button>
 
             <button
               type="button"
               id="cancel-btn"
               class="cancel"
               style="display: none"
+              title="reset form, chuyển sang thêm người dùng"
             >
               Hủy
             </button>

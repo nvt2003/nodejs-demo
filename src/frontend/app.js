@@ -10,6 +10,7 @@ const nameInput = document.getElementById("name");
 const emailInput = document.getElementById("email");
 const passwordInput = document.getElementById("password");
 const imageInput = document.getElementById("image");
+const submitFormBtn = document.getElementById("submit-form-btn")
 
 const userList = document.getElementById("user-list");
 
@@ -37,18 +38,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   const notice = document.getElementById("permission-denied-box-notice"); 
   const requestViewBtn = document.getElementById("request-view-btn"); 
   const requestEditBtn = document.getElementById("request-edit-btn");
-  // Nếu có quyền ('Admin', 'View', hoặc 'Edit') 
-  // -> Hiển thị UI và tải danh sách user
+  // Nếu có quyền ('admin', 'view', hoặc 'edit') 
+  // -> Hiển thị tải và hiển thị danh sách user
   // Nếu không có quyền -> Ẩn nội dung chính, hiện hộp gửi yêu cầu quyền
   if (user) {
     mainContent.style.display = "block"; 
     permissionDeniedBox.style.display = "none";
-    loadUsers()
+    await loadUsers()
     //Nếu chỉ có quyền Xem thì hiển thị thông báo 
-    //và nút yêu câu quyền Sửa
     if (user.result.role === "view") { 
         permissionDeniedBox.style.display = "block";
-        requestViewBtn.style.display = "none"; 
+        requestViewBtn.style.display = "none";
+        activeCss()
         notice.innerHTML = ` 
         <h2 style="color: #856404; margin-bottom: 10px"> 
             Tài khoản của bạn chỉ có quyền Xem (View) 
@@ -80,7 +81,21 @@ document.addEventListener("DOMContentLoaded", async () => {
         setupRequestButtons();
     
 });
-
+function activeCss(){
+    exportBtn.classList.add('need-edit-per');
+    importBtn.classList.add('need-edit-per');
+    sendEmailBtn.classList.add('need-edit-per');
+    submitFormBtn.classList.add('need-edit-per');
+    const editBtns = document.querySelectorAll('.btn-edit');
+    editBtns.forEach(btn=>{
+        btn.classList.add('need-edit-per');
+    })
+    const delBtns = document.querySelectorAll('.btn-delete');
+    delBtns.forEach(btn=>{
+        btn.classList.add('need-edit-per');
+    })
+    
+}
 // Gọi api kiểm tra Session & Role từ Backend
 async function checkPermission() {
   try {
@@ -106,7 +121,7 @@ async function checkPermission() {
   }
 }
 
-//Lắng nghe sự kiện cho các nút Yêu cầu quyền (View / Edit)
+//Lắng nghe sự kiện cho các nút Yêu cầu quyền (view / edit)
 function setupRequestButtons() {
   const reqViewBtn = document.getElementById("request-view-btn");
   const reqEditBtn = document.getElementById("request-edit-btn");
@@ -129,7 +144,7 @@ async function sendPermissionRequest(requestedRole) {
     alert(res.data.message);
     // Kiểm tra xem nếu gặp lỗi trùng lặp yêu cầu 
     // mà yêu cầu quyền khác với cái cũ 
-    // thì người dùng có muốn thay đổi yêu cầu theo quyền mới chọn không
+    // thì hỏi người dùng có muốn thay đổi yêu cầu theo quyền mới chọn không
     if (res.status==400&&res.data?.requestedRole!=requestedRole){
         //Xác nhận đổi yêu cầu cấp quyền mới
         if(confirm(`Bạn có muốn đổi yêu cầu cấp quyền sang ${requestedRole}`)){
@@ -235,7 +250,7 @@ function renderUsers(users) {
         userList.appendChild(tr);
     });
 }
-//Xử lí khi submit (Nút 'lưu người dùng' và 'sửa người dùng')
+//Xử lí khi submit (Thêm và sửa user)
 form.addEventListener(
     "submit",
     async function (event) {
@@ -490,9 +505,10 @@ csvFileInput.addEventListener("change", async function () {
 
     try {
         const { status, data } = await userApi.importCSV(formData);
-      //kiểm tra xem thành công không
-      //nếu thành công thì thông báo, load lại danh sách
-      //không thì báo lỗi
+      //Kiểm tra xem import thành công không
+      //thông báo số lượng user import được/tổng số lượng trong file
+      //load lại danh sách
+      //Thông báo khi gặp lỗi
         if (status === 200 || status === 201) {
             alert(data.message || "Import dữ liệu thành công!");
             await loadUsers();
@@ -508,10 +524,12 @@ csvFileInput.addEventListener("change", async function () {
 });
 async function exportCSV(){
     const response = await userApi.exportCSV();
+    //Thông báo khi xuất file thành công
+    //Thông báo khi gặp lỗi
     if (response.status==200){
         alert("Xuất file thành công! Hãy kiểm tra thư mục tải về của bạn.")
     }else{
-        alert(response.message||"Có lỗi xảy ra")
+        alert(response.data?.message||"Có lỗi xảy ra")
     }
 }
 //reset form email và bật modal nhập dữ liệu gửi email
@@ -534,7 +552,7 @@ confirmSendEmailBtn.addEventListener("click", async function () {
 
     // Kiểm tra người nhận
     if (!to) {
-        alert("Vui lòng nhập email người nhận (hoặc nhập ALL)!");
+        alert("Vui lòng nhập email người nhận!");
         emailToInput.focus();
         return;
     }
@@ -565,10 +583,10 @@ confirmSendEmailBtn.addEventListener("click", async function () {
         // gửi thành công thì thông báo và tắt form gửi
         // không thì giữ form và báo lỗi
         if (res && (res.status === 200 || res.status === 201 || res.success)) {
-            alert(res.message || "Gửi email thành công!");
+            alert(res.data?.message || "Gửi email thành công!");
             emailModal.style.display = "none";
         } else {
-            alert((res && res.message) || "Không thể gửi email!");
+            alert((res && res.data?.message) || "Không thể gửi email!");
         }
     } catch (error) {
         console.error("Lỗi gửi email:", error);
