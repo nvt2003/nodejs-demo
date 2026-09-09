@@ -48,7 +48,7 @@ async function loadPermissionRequests() {
     const res = await permissionApi.getPendingRequests()
     //Nếu api trả về lỗi thì bỏ qua lấy danh sách từ api
     if (res.status!==200) {
-      alert(res?.message||"Đã xảy ra lỗi")
+      alert(res?.data?.message||"Đã xảy ra lỗi")
       return;
     }
 
@@ -106,7 +106,7 @@ async function processPermission(requestId, action, role) {
 
   try {
     const res = await permissionApi.handlePermission(requestId,action,role)
-    alert(res.data.message);
+    alert(res.data?.message);
     // Load lại danh sách yêu cầu quyền và quyền đã duyệt nếu call api thành công
     if (res.status===200) {
       loadPermissionRequests(); 
