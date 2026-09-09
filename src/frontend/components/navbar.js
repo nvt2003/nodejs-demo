@@ -10,9 +10,39 @@ const Navbar = {
         return `
             <header class="main-header" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 24px; background-color: #2c3e50; color: #fff;">
                 <div class="header-logo" style="font-weight: bold;">
-                    <a href="#" style="color: #fff; text-decoration: none; font-size: 25px; margin-right:10px; padding-right:10px;border-right: 1px solid #415a72;">My App</a>
-                    <a href="/" style="color: #fff; text-decoration: none; margin-right:10px; padding-right:10px;border-right: 1px solid #415a72;">Người dùng</a>
-                    <a href="/permission" style="color: #fff; text-decoration: none; margin-right:10px; padding-right:10px;border-right: 1px solid #415a72;">Quyền</a>
+                    <a 
+                        href="#" 
+                        style="color: #fff; 
+                            text-decoration: none; 
+                            font-size: 25px; 
+                            margin-right:10px; 
+                            padding-right:10px;
+                            border-right: 1px solid #415a72;"
+                    >
+                        My App
+                    </a>
+                    <a 
+                        href="/" 
+                        style="color: #fff; 
+                            text-decoration: none; 
+                            margin-right:10px; 
+                            padding-right:10px;
+                            border-right: 1px solid #415a72;"
+                        title="Danh sách user"
+                    >
+                        Người dùng
+                    </a>
+                    <a 
+                        href="/permission" 
+                        style="color: #fff; 
+                            text-decoration: none; 
+                            margin-right:10px; 
+                            padding-right:10px;
+                            border-right: 1px solid #415a72;"
+                        title="Cấp quyền truy cập cho user (Chỉ Admin)"
+                    >
+                        Quyền
+                    </a>
                 </div>
 
                 <div class="header-user-action" style="display: flex; align-items: center; gap: 12px;">
@@ -91,7 +121,7 @@ const Navbar = {
                         alert("Đăng nhập thành công!");
                         window.location.reload(); 
                     } else {
-                        alert(res.message || "Đăng nhập thất bại!");
+                        alert(res.data.message || "Đăng nhập thất bại!");
                     }
                 } catch (error) {
                     console.error("Lỗi đăng nhập:", error);

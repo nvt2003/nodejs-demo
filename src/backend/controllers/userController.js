@@ -338,7 +338,9 @@ export const userController={
         const {email,password} = await getBody(req);
         try{
             const response = await userModel.checklogin(email,password);
-            //kiểm tra xem đăng nhập thành công không
+            //Kiểm tra xem đăng nhập thành công không
+            //Nếu dữ liệu trả về có tồn tại thì là có tài khoản khớp với thông tin
+            //Ngược lại nếu không là do thông tin không khớp với bất kỳ tài khoản nào
             if (response&&response.length>0){
                 return sendJSON(res,200,{
                     message:"Đăng nhập thành công",
